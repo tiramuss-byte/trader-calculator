@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0b0f19">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.json">
+  <title>Калькулятор трейдера PRO</title>
+  <style>
+    :root { --bg: #0b0f19; --card: #111827; --border: #1f2937; --accent: #3b82f6; --text: #f1f5f9; --muted: #94a3b8; --green: #22c55e; --red: #ef4444; --orange: #f59e0b; --purple: #8b5cf6; }
+    * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); padding: 12px; }
+    .wrap { max-width: 620px; margin: 0 auto; }
+    h1 { font-size: 1.2rem; text-align: center; margin: 0 0 12px; font-weight: 600; }
+    .tabs { display: flex; gap: 4px; margin-bottom: 12px; }
+    .tab { flex: 1; padding: 8px; background: var(--card); border: 1px solid var(--border); color: var(--muted); cursor: pointer; border-radius: 6px; font-size: 0.85rem; }
+    .tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 10px; }
+    label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 3px; }
+    input, select { width: 100%; padding: 9px; background: #070a11; border: 1px solid var(--border); color: var(--text); border-radius: 5px; font-size: 0.95rem; margin-bottom: 8px; }
+    input:focus, select:focus { border-color: var(--accent); }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+    .row-4 { display: grid; grid-template-columns: 0.7fr 1fr 0.9fr 0.9fr auto; gap: 6px; align-items: center; }
+    .btn { width: 100%; padding: 11px; background: var(--accent); color: #fff; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; margin-top: 2px; }
+    .btn:active { transform: scale(0.99); }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; padding: 8px; cursor: pointer; border-radius: 6px; }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-xs { padding: 4px 8px; font-size: 0.75rem; width: auto; }
+    .toolbar { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 8px; }
+    .spec-box { background: #070a11; border-radius: 6px; padding: 10px; margin-bottom: 10px; font-size: 0.85rem; }
+    .spec-row { display: flex; justify-content: space-between; margin: 3px 0; }
+    .spec-label { color: var(--muted); }
+    .status { font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; margin-left: 6px; }
+    .status.active { background: #14532d; color: var(--green); }
+    .status.suspended { background: #451a03; color: var(--orange); }
+    .results { display: grid; gap: 6px; font-size: 0.9rem; }
+    .res { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border); }
+    .res:last-child { border: none; }
+    .res span:first-child { color: var(--muted); }
+    .val { font-weight: 600; }
+    .val.green { color: var(--green); }
+    .val.red { color: var(--red); }
+    .val.orange { color: var(--orange); }
+    .val.purple { color: var(--purple); }
+    .hidden { display: none !important; }
+    .status-msg { font-size: 0.75rem; margin: -4px 0 8px; min-height: 18px; text-align: center; }
+    .status-msg.ok { color: var(--green); }
+    .status-msg.warn { color: var(--orange); }
+    .status-msg.err { color: var(--red); }
+    .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); display:flex; align-items:center; justify-content:center; z-index:1000; }
+    .modal { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; width: 90%; max-width: 440px; }
+    .modal h3 { margin: 0 0 12px; font-size: 1rem; }
+    .modal-actions { display: flex; gap: 8px; margin-top: 12px; }
+    optgroup { font-weight: bold; color: #60a5fa; }
+    option { color: var(--text); padding: 4px 0; }
+    .toggle-group { display: flex; background: #070a11; border-radius: 5px; overflow: hidden; margin-bottom: 8px; border: 1px solid var(--border); }
+    .toggle-group button { flex: 1; padding: 6px; background: transparent; border: none; color: var(--muted); cursor: pointer; font-size: 0.8rem; }
+    .toggle-group button.active { background: var(--accent); color: #fff; }
+    .hint { font-size: 0.7rem; color: var(--muted); margin-top: -5px; margin-bottom: 8px; }
+    .checkbox-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 0.85rem; color: var(--muted); }
+    .checkbox-row input { width: auto; margin: 0; }
+    .fee-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 6px; align-items: end; margin-bottom: 8px; }
+    .fee-label { font-size: 0.75rem; color: var(--muted); margin-bottom: 2px; }
+    .fee-actions { display: flex; gap: 4px; }
+    .badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; margin-left: 6px; }
+    .badge.green { background: #14532d; color: var(--green); }
+    .badge.orange { background: #451a03; color: var(--orange); }
+    .info-box { background: #1e293b; border-left: 3px solid var(--accent); padding: 8px 10px; font-size: 0.75rem; color: var(--muted); margin-bottom: 10px; border-radius: 0 4px 4px 0; }
+    .order-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; margin: 10px 0; }
+    .order-table th, .order-table td { padding: 6px 8px; border-bottom: 1px solid var(--border); text-align: left; }
+    .order-table th { color: var(--muted); font-weight: 600; }
+    .order-table tr:hover { background: #0f1420; }
+    .copy-btn { background: var(--purple); color: #fff; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; margin-top: 8px; width: 100%; }
+    .copy-btn:active { transform: scale(0.98); }
+    .copy-btn.copied { background: var(--green); }
+    .mode-toggle { display: flex; gap: 8px; margin-bottom: 12px; }
+    .mode-btn { flex: 1; padding: 10px; background: var(--card); border: 1px solid var(--border); color: var(--muted); cursor: pointer; border-radius: 6px; font-size: 0.85rem; }
+    .mode-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .lot-toggle { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--muted); margin: 4px 0 8px; }
+    .lot-toggle input { width: auto; margin: 0; }
+    .order-input { font-size: 0.85rem; padding: 6px; margin-bottom: 0; }
+    .remove-btn { background: transparent; border: none; color: var(--red); font-size: 1.2rem; cursor: pointer; padding: 4px; }
+    .remove-btn:hover { color: #ff6666; }
+    .sync-card { background: #161b27; border-left: 3px solid var(--accent); padding: 10px; margin-bottom: 12px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>📊 Калькулятор трейдера</h1>
+    <div class="tabs">
+      <button class="tab active" data-m="moex">Мосбиржа</button>
+      <button class="tab" data-m="crypto">Крипто</button>
+      <button class="tab" data-m="forex">Forex</button>
+    </div>
+
+    <!-- МОСБИРЖА -->
+    <div id="panel-moex" class="panel">
+      <div class="card">
+        <div class="toolbar">
+          <button class="btn-outline" onclick="fetchCBR()">📈 Курс ЦБ РФ</button>
+          <button class="btn-outline" onclick="fetchFromMoex()">📥 MOEX API</button>
+          <button class="btn-outline" onclick="openEditor()">✏️ Ред. спеки</button>
+        </div>
+        <label>Инструмент</label><select id="instrument"></select>
+        <div class="spec-box" id="moexSpecs">
+          <div class="spec-row"><span class="spec-label">Шаг цены:</span><span id="specStep">-</span></div>
+          <div class="spec-row"><span class="spec-label">Стоимость шага:</span><span id="specStepValue">-</span></div>
+          <div class="spec-row"><span class="spec-label">Лот:</span><span id="specLot">-</span></div>
+          <div class="spec-row"><span class="spec-label">ГО (ориентир):</span><span id="specGo">-</span></div>
+          <div class="spec-row"><span class="spec-label">Статус:</span><span id="specStatus">-</span></div>
+        </div>
+        <label>Депозит (₽)</label><input type="number" id="deposit" value="100000" step="any">
+        <label>Риск</label><div class="toggle-group" id="riskToggle"><button class="active" data-v="percent">% от депозита</button><button data-v="fixed">Фикс. сумма</button></div>
+        <input type="number" id="riskInput" value="1" step="any" placeholder="1">
+        <div class="hint" id="riskHint">Будет рассчитано: 1% от депозита</div>
+        <div class="row">
+          <div><label>Цена входа</label><input type="number" id="entry" step="any" placeholder="0"></div>
+          <div><label>Стоп-лосс</label><div class="toggle-group" id="stopToggle"><button class="active" data-v="price">Цена</button><button data-v="pct">% от входа</button></div><input type="number" id="stopInput" step="any" placeholder="Цена стопа"><div class="hint" id="stopHint">Дистанция стопа: 0</div></div>
+        </div>
+        <label>Тейк-профит (опционально)</label><input type="number" id="tpInput" step="any" placeholder="Не задан">
+        <div class="status-msg" id="cbrStatus">Курс не загружен</div>
+        <button class="btn" onclick="runMoexCalc()">Рассчитать позицию</button>
+      </div>
+    </div>
+
+    <!-- КРИПТО -->
+    <div id="panel-crypto" class="panel hidden">
+      <div class="card">
+        <label>Инструмент</label><select id="cryptoInstrument"></select>
+        <label>Депозит (USDT)</label><input type="number" id="cryptoDeposit" value="1000" step="any">
+        <label>Риск</label><div class="toggle-group" id="cryptoRiskToggle"><button class="active" data-v="percent">% от депозита</button><button data-v="fixed">Фикс. сумма</button></div>
+        <input type="number" id="cryptoRiskInput" value="1" step="any">
+        <div class="row"><div><label>Вход</label><input type="number" id="cryptoEntry" step="any"></div><div><label>Стоп</label><input type="number" id="cryptoStop" step="any"></div></div>
+        <div class="toggle-group" id="cryptoStopToggle" style="margin-top:-4px;"><button class="active" data-v="price">Цена</button><button data-v="pct">% от входа</button></div>
+        <label>Тейк-профит</label><input type="number" id="cryptoTP" step="any">
+        <label>Плечо</label><input type="number" id="cryptoLeverage" value="20" step="any">
+        <button class="btn" onclick="runCryptoCalc()">Рассчитать</button>
+      </div>
+    </div>
+
+    <!-- FOREX: Классический -->
+    <div id="panel-forex-classic" class="panel hidden">
+      <div class="card">
+        <div class="mode-toggle">
+          <button class="mode-btn active" data-mode="classic">📈 Классический</button>
+          <button class="mode-btn" data-mode="grid">🕸️ Сеточная торговля</button>
+        </div>
+        <div class="toolbar">
+          <select id="fxBroker"><option value="roboforex">RoboForex</option><option value="bcs">БКС Форекс</option><option value="custom">Custom</option></select>
+          <select id="fxAccount"><option value="ecn">ECN / Prime</option><option value="standard">Standard</option><option value="procent">ProCent</option></select>
+        </div>
+        <div id="swapFreeRow" class="checkbox-row hidden">
+          <input type="checkbox" id="fxSwapFree" checked>
+          <label for="fxSwapFree">☑ Swap-Free (валюты + металлы)</label>
+          <span id="swapFreeBadge" class="badge green">🟢 Без свопов</span>
+        </div>
+        <div id="swapFreeWarn" class="status-msg warn hidden">⚠️ Этот инструмент НЕ входит в Swap-Free программу</div>
+        
+        <label>Пара / Инструмент</label><select id="fxPair"></select>
+        <div class="info-box" id="fxInfoBox">💡 Standard: 1 лот = 100 000 ед. | Пункт ≈ $1.00</div>
+        
+        <div class="lot-toggle">
+          <input type="checkbox" id="fxLotToggle" checked>
+          <label for="fxLotToggle">Показывать лоты в формате моего счёта (ProCent ×100)</label>
+        </div>
+        
+        <div class="row">
+          <div><label>Валюта счёта</label>
+            <select id="fxAccCur" onchange="updateDepositLabel()">
+              <option value="USD">USD</option>
+              <option value="RUB">RUB</option>
+            </select>
+          </div>
+          <div><label>Направление</label>
+            <div class="toggle-group" id="fxDirToggle">
+              <button class="active" data-v="long">Long</button>
+              <button data-v="short">Short</button>
+            </div>
+          </div>
+        </div>
+
+        <label id="lblDeposit">Депозит ($)</label><input type="number" id="fxDeposit" value="10000" step="any">
+        <label>Риск</label><div class="toggle-group" id="fxRiskToggle"><button class="active" data-v="percent">% от депозита</button><button data-v="fixed">Фикс. сумма ($)</button></div>
+        <input type="number" id="fxRiskInput" value="1" step="any">
+        <div class="hint" id="fxRiskHint">Будет рассчитано: 1% от депозита ($)</div>
+        
+        <div class="row">
+          <div><label>Цена входа</label><input type="number" id="fxEntry" step="any"></div>
+          <div><label>Стоп-лосс</label><input type="number" id="fxStop" step="any"></div>
+        </div>
+        <label>Тейк-профит (опционально)</label><input type="number" id="fxTP" step="any">
+        
+        <div class="row">
+          <div><label>Плечо (1:)</label><input type="number" id="fxLeverage" value="100" step="any"></div>
+          <div><label>Срок удержания (ночей)</label><input type="number" id="fxNights" value="1" min="0" step="1"></div>
+        </div>
+        <div class="checkbox-row"><input type="checkbox" id="fxWedSwap"><label for="fxWedSwap">Учитывать тройной своп (среда → четверг)</label></div>
+        
+        <div style="margin-top:12px; padding-top:10px; border-top:1px solid var(--border)">
+          <label>Спред и комиссия</label>
+          <div class="fee-row">
+            <div><div class="fee-label">Спред (пипсы)</div><input type="number" id="fxSpread" step="0.1" value="0"></div>
+            <div><div class="fee-label">Комиссия ($/лот)</div><input type="number" id="fxComm" step="0.1" value="0"></div>
+            <div class="fee-actions">
+              <button class="btn-outline btn-xs" onclick="alert('Спеки подтягиваются автоматически')">📥</button>
+              <button class="btn-outline btn-xs" onclick="resetFxFees()">🔄</button>
+            </div>
+          </div>
+          <div class="hint">Оставьте пустым для расчёта без издержек</div>
+        </div>
+        <button class="btn" onclick="calcForex()">Рассчитать позицию</button>
+      </div>
+    </div>
+
+    <!-- FOREX: Сетка -->
+    <div id="panel-forex-grid" class="panel hidden">
+      <div class="card">
+        <div class="mode-toggle">
+          <button class="mode-btn" data-mode="classic">📈 Классический</button>
+          <button class="mode-btn active" data-mode="grid">🕸️ Сеточная торговля</button>
+        </div>
+        <label>Пара</label><select id="gridPair"></select>
+        <div class="info-box" id="gridInfoBox">💡 ProCent: 1 лот = 1 000 ед. | Пункт ≈ $0.01</div>
+        <div class="row-3">
+          <div><label>Депозит ($)</label><input type="number" id="gridDeposit" value="1000" step="any"></div>
+          <div><label>Риск (%)</label><input type="number" id="gridRisk" value="37" step="0.1"></div>
+          <div><label>Направление</label><div class="toggle-group" id="gridDirToggle"><button class="active" data-v="long">Long 📉</button><button data-v="short">Short 📈</button></div></div>
+        </div>
+        <div class="row">
+           <div><label>Стоп-лосс сетки (пипсы)</label><input type="number" id="gridGlobalSL" value="340" step="1"></div>
+           <div>
+             <label>Коэффициент (сумма)</label>
+             <div style="display:flex; gap:4px;">
+               <input type="number" id="gridCoefficient" value="4.42" step="0.01">
+               <button class="btn-outline btn-xs" onclick="calcCoefficient()">🧮</button>
+             </div>
+           </div>
+        </div>
+        <div class="hint">Риск на «единицу» = Общий риск% ÷ Коэффициент</div>
+        <div class="row-3">
+          <div><label>Цена входа</label><input type="number" id="gridEntry" step="any" placeholder="1.0850"></div>
+          <div><label>Шаг сетки (пипсы)</label><input type="number" id="gridStep" value="340" min="10"></div>
+          <div><label>Плечо (1:)</label><input type="number" id="gridLeverage" value="100" min="1"></div>
+        </div>
+        <label>Параметры ордеров</label>
+        <div id="gridOrdersContainer"></div>
+        <div class="row" style="margin-top:8px;">
+          <button class="btn-outline btn-xs" onclick="addOrderRow()">➕ Добавить ордер</button>
+          <button class="btn-outline btn-xs" onclick="removeOrderRow()">➖ Удалить</button>
+        </div>
+        <div class="lot-toggle">
+          <input type="checkbox" id="gridLotToggle" checked>
+          <label for="gridLotToggle">Показывать лоты в формате моего счёта (ProCent ×100)</label>
+        </div>
+        <div class="checkbox-row">
+          <input type="checkbox" id="gridSwapCheck">
+          <label for="gridSwapCheck">☑ Учитывать свопы (опционально)</label>
+        </div>
+        <div id="gridSwapRow" class="row hidden">
+          <div><label>Своп Long ($/лот/ночь)</label><input type="number" id="gridSwapLong" value="-0.05" step="any"></div>
+          <div><label>Своп Short ($/лот/ночь)</label><input type="number" id="gridSwapShort" value="0.02" step="any"></div>
+        </div>
+        <label>Срок удержания (ночей)</label><input type="number" id="gridNights" value="1" min="0">
+        <button class="btn" onclick="calcGrid()">📊 Рассчитать сетку</button>
+      </div>
+      <div class="card hidden" id="gridResults">
+        <h3 style="margin:0 0 10px;font-size:1rem">📋 Ордера сетки</h3>
+        <table class="order-table">
+          <thead><tr><th>#</th><th>Цена</th><th>Лот</th><th>Δ Лот</th><th>SL (Цена)</th><th>TP (Цена)</th></tr></thead>
+          <tbody id="gridTableBody"></tbody>
+        </table>
+        <div class="spec-box">
+          <div class="spec-row"><span class="spec-label">Целевой риск:</span><span class="val" id="gridTargetRisk">-</span></div>
+          <div class="spec-row"><span class="spec-label">Риск на «единицу»:</span><span class="val orange" id="gridUnitRisk">-</span></div>
+          <div class="spec-row"><span class="spec-label">Общий итоговый риск:</span><span class="val red" id="gridTotalRisk">-</span></div>
+          <div class="spec-row"><span class="spec-label">Общий объём:</span><span class="val" id="gridTotalLots">-</span></div>
+          <div class="spec-row"><span class="spec-label">Средняя цена входа:</span><span class="val" id="gridAvgEntry">-</span></div>
+          <div class="spec-row"><span class="spec-label">Требуемая маржа:</span><span class="val" id="gridMargin">-</span></div>
+          <div class="spec-row" id="gridSwapRowRes"><span class="spec-label">Своп (за период):</span><span class="val red" id="gridSwapTotal">-</span></div>
+        </div>
+        <button class="copy-btn" onclick="copyGridLevels()">📋 Копировать уровни для терминала</button>
+      </div>
+    </div>
+
+    <!-- Синхронизация настроек -->
+    <div class="card sync-card">
+      <h3 style="margin:0 0 8px; font-size:1rem;">💾 Синхронизация настроек</h3>
+      <div class="toolbar">
+        <button class="btn-outline" onclick="exportSettings()">💾 Скачать настройки</button>
+        <button class="btn-outline" onclick="document.getElementById('fileInput').click()">📂 Загрузить настройки</button>
+        <input type="file" id="fileInput" accept=".json" hidden onchange="importSettings(this)">
+      </div>
+      <div class="hint" id="syncStatus">Экспортируйте спеки с ПК → загрузите на телефон</div>
+    </div>
+
+    <!-- Общие результаты -->
+    <div class="card results hidden" id="results">
+      <div class="res"><span>Размер позиции</span><span class="val" id="rSize">-</span></div>
+      <div class="res"><span>Маржа</span><span class="val" id="rMargin">-</span></div>
+      <div class="res"><span>Стоимость 1 пункта</span><span class="val" id="rPipVal">-</span></div>
+      <div class="res"><span>Спред (вход)</span><span class="val red" id="rSpread">-</span></div>
+      <div class="res"><span>Комиссия (круговая)</span><span class="val red" id="rComm">-</span></div>
+      <div class="res"><span>Своп</span><span class="val red" id="rSwap">-</span></div>
+      <div class="res"><span>Валовый риск (SL)</span><span class="val orange" id="rGrossRisk">-</span></div>
+      <div class="res"><span>Чистый риск (с издержками)</span><span class="val red" id="rNetRisk">-</span></div>
+      <div class="res hidden" id="tpRow"><span>P&L при TP (чистый)</span><span class="val purple" id="rNetTP">-</span></div>
+      <div class="res hidden" id="rrRow"><span>Соотношение R:R (чистое)</span><span class="val purple" id="rRR">-</span></div>
+    </div>
+  </div>
+
+  <!-- МОДАЛЬНОЕ ОКНО РЕДАКТИРОВАНИЯ -->
+  <div id="editModal" class="modal-overlay hidden">
+    <div class="modal">
+      <h3>✏️ Параметры контракта</h3>
+      <label>Шаг цены</label><input type="number" id="editStep" step="any">
+      <label>Стоимость шага (₽)</label><input type="number" id="editStepValue" step="any">
+      <label>Лот</label><input type="number" id="editLot" step="any">
+      <label>ГО (обеспечение)</label><input type="number" id="editGo" step="any">
+      <div class="modal-actions">
+        <button class="btn" onclick="saveManualSpec()">Сохранить</button>
+        <button class="btn btn-outline" onclick="$('editModal').classList.add('hidden')">Отмена</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // === ДАННЫЕ ===
+    const ACCOUNT_TYPES = { ecn: { lotSize: 100000, defaultComm: 3.5, label: "ECN/Prime" }, standard: { lotSize: 100000, defaultComm: 0, label: "Standard" }, procent: { lotSize: 1000, defaultComm: 0, label: "ProCent" } };
+    const MOEX_GROUPS = {
+      "💱 Валютные пары": { "Si-12.26": { step: 1, stepValue: 10, lot: 1000, go: 12500, currency: "RUB", status: "active", name: "USD/RUB", isUsd: true }, "ED-12.26": { step: 0.0001, stepValue: 10, lot: 1000, go: 24000, currency: "RUB", status: "active", name: "EUR/RUB", isUsd: false }, "CNY-12.26": { step: 0.0001, stepValue: 1, lot: 1000, go: 9000, currency: "RUB", status: "active", name: "CNY/RUB", isUsd: false }, "UJPY-12.26": { step: 0.01, stepValue: 1, lot: 10, go: 14000, currency: "RUB", status: "active", name: "RUB/JPY", isUsd: false } },
+      "🛢️ Товарные фьючерсы": { "BR-12.26": { step: 0.01, stepValue: 100, lot: 100, go: 38000, currency: "RUB", status: "active", name: "Нефть Brent", isUsd: true }, "NG-12.26": { step: 0.001, stepValue: 10, lot: 1000, go: 19000, currency: "RUB", status: "active", name: "Природный газ", isUsd: true }, "GOLD-12.26": { step: 0.01, stepValue: 100, lot: 100, go: 48000, currency: "RUB", status: "active", name: "Золото", isUsd: true }, "SILV-12.26": { step: 0.001, stepValue: 10, lot: 1000, go: 23000, currency: "RUB", status: "active", name: "Серебро", isUsd: true } },
+      "🇺 Индексы акций США": { "SPMX-12.26": { step: 0.01, stepValue: 10, lot: 1, go: 16000, currency: "RUB", status: "active", name: "S&P 500", isUsd: false }, "NDX-12.26": { step: 0.01, stepValue: 10, lot: 1, go: 15000, currency: "RUB", status: "active", name: "Nasdaq 100", isUsd: false }, "RUS-12.26": { step: 0.01, stepValue: 10, lot: 1, go: 14000, currency: "RUB", status: "active", name: "Russell 2000", isUsd: false }, "DJI-12.26": { step: 1, stepValue: 50, lot: 1, go: 45000, currency: "RUB", status: "active", name: "Dow Jones 30", isUsd: true } },
+      "🌍 Индексы Азии и Европы": { "NKD-12.26": { step: 1, stepValue: 50, lot: 1, go: 45000, currency: "RUB", status: "active", name: "Nikkei 225", isUsd: true }, "HSI-12.26": { step: 1, stepValue: 50, lot: 1, go: 40000, currency: "RUB", status: "active", name: "Hang Seng", isUsd: true }, "DAX-12.26": { step: 1, stepValue: 50, lot: 1, go: 40000, currency: "RUB", status: "active", name: "DAX 40", isUsd: true }, "STO-12.26": { step: 1, stepValue: 50, lot: 1, go: 35000, currency: "RUB", status: "active", name: "Euro Stoxx 50", isUsd: true } },
+      "₿ Криптовалюты (MOEX)": { "BTC-12.26": { step: 1, stepValue: 10, lot: 0.01, go: 30000, currency: "RUB", status: "active", name: "Bitcoin", isUsd: true }, "ETH-12.26": { step: 0.1, stepValue: 1, lot: 0.1, go: 25000, currency: "RUB", status: "active", name: "Ethereum", isUsd: true } },
+      "🇷 Индексы РФ и ОФЗ": { "RTS-12.26": { step: 1, stepValue: 20, lot: 1, go: 52000, currency: "RUB", status: "active", name: "Индекс РТС", isUsd: true }, "MXI-12.26": { step: 1, stepValue: 50, lot: 1, go: 35000, currency: "RUB", status: "active", name: "Индекс МосБиржи", isUsd: false }, "RGBI-12.26": { step: 0.01, stepValue: 10, lot: 10, go: 13000, currency: "RUB", status: "active", name: "Индекс ОФЗ", isUsd: false } }
+    };
+    const DEFAULT_SPECS = { 
+      moex: {}, 
+      crypto: { "BTCUSDT": { tick: 0.1 }, "ETHUSDT": { tick: 0.01 }, "SOLUSDT": { tick: 0.01 }, "XRPUSDT": { tick: 0.0001 } }, 
+      forex: { 
+        "EURUSD": { pip: 0.00001, pipValueUSD: 1.0 }, "GBPUSD": { pip: 0.00001, pipValueUSD: 1.0 }, "USDJPY": { pip: 0.001, pipValueUSD: 0.92 }, 
+        "USDCHF": { pip: 0.00001, pipValueUSD: 1.0 }, "AUDUSD": { pip: 0.00001, pipValueUSD: 1.0 }, "USDCAD": { pip: 0.00001, pipValueUSD: 0.74 }, 
+        "NZDUSD": { pip: 0.00001, pipValueUSD: 1.0 }, "EURGBP": { pip: 0.00001, pipValueUSD: 1.25 }, "EURJPY": { pip: 0.001, pipValueUSD: 0.92 }, 
+        "EURCHF": { pip: 0.00001, pipValueUSD: 1.1 }, "EURAUD": { pip: 0.00001, pipValueUSD: 0.68 }, "EURCAD": { pip: 0.00001, pipValueUSD: 0.74 }, 
+        "GBPJPY": { pip: 0.001, pipValueUSD: 1.28 }, "GBPCHF": { pip: 0.00001, pipValueUSD: 1.25 }, "AUDJPY": { pip: 0.001, pipValueUSD: 0.68 }, 
+        "AUDCAD": { pip: 0.00001, pipValueUSD: 0.74 }, "CADJPY": { pip: 0.001, pipValueUSD: 0.74 }, "NZDJPY": { pip: 0.001, pipValueUSD: 0.65 }, 
+        "USDTRY": { pip: 0.00001, pipValueUSD: 0.28 }, "USDZAR": { pip: 0.00001, pipValueUSD: 0.55 }, 
+        "XAUUSD": { pip: 0.01, pipValueUSD: 1.0 }, "XAGUSD": { pip: 0.001, pipValueUSD: 1.0 }, 
+        "XPTUSD": { pip: 0.01, pipValueUSD: 1.0 }, "XPDUSD": { pip: 0.01, pipValueUSD: 1.0 } 
+      } 
+    };
+    const BROKER_PROFILES = { 
+      roboforex: { specsUrl: "https://roboforex.com/forex-trading/trading/specifications/", ecn: { spread: 1.2, commPerLot: 3.5, swapLong: -4.8, swapShort: 1.5 }, standard: { spread: 1.8, commPerLot: 0, swapLong: -6.2, swapShort: 2.1 }, procent: { spread: 2.2, commPerLot: 0, swapLong: -0.05, swapShort: 0.02 } }, 
+      bcs: { 
+        specsUrl: "https://bcs.ru/forex/specifications", 
+        standard: { spread: 0, commPerLot: 0, swapLong: 0, swapShort: 0 }, 
+        instruments: { 
+          "EURUSD": { spread: 1.5, swapLong: -6.90, swapShort: 0.05 }, "GBPUSD": { spread: 2.0, swapLong: -3.00, swapShort: -3.70 }, 
+          "USDJPY": { spread: 1.5, swapLong: 2.00, swapShort: -24.00 }, "AUDUSD": { spread: 1.8, swapLong: -2.70, swapShort: -1.50 }, 
+          "USDCAD": { spread: 2.0, swapLong: 0.10, swapShort: -13.00 }, "NZDUSD": { spread: 2.0, swapLong: -3.20, swapShort: -1.30 }, 
+          "AUDCAD": { spread: 2.5, swapLong: -2.00, swapShort: -6.60 }, "EURJPY": { spread: 2.0, swapLong: -1.50, swapShort: -16.00 }, 
+          "GBPJPY": { spread: 2.5, swapLong: -0.50, swapShort: -29.00 }, "CHFJPY": { spread: 2.5, swapLong: -9.00, swapShort: -6.50 }, 
+          "AUDCHF": { spread: 2.2, swapLong: 0.30, swapShort: -9.20 }, 
+          "XAUUSD": { spread: 25, swapLong: -55.00, swapShort: 6.00, pip: 0.01, pipValueUSD: 1.0 }, 
+          "XAGUSD": { spread: 30, swapLong: -5.00, swapShort: -25.00, pip: 0.001, pipValueUSD: 1.0 }, 
+          "#WTI": { spread: 30, swapLong: -10.00, swapShort: -200.00, pip: 0.01, pipValueUSD: 10.0 } 
+        } 
+      }, 
+      custom: { specsUrl: "", spread: 1.5, commPerLot: 0, swapLong: -5, swapShort: 1 } 
+    };
+    const SWAP_FREE_INSTRUMENTS = new Set(["EURUSD","GBPUSD","USDJPY","USDCHF","AUDUSD","USDCAD","NZDUSD","EURGBP","EURJPY","EURCHF","EURAUD","EURCAD","GBPJPY","GBPCHF","AUDJPY","AUDCAD","CADJPY","NZDJPY","USDTRY","USDZAR","USDMXN","USDSEK","USDNOK","USDPLN","USDCZK","USDHUF","USDILS","USDSGD","USDHKD","USDRUB","EURTRY","EURZAR","EURPLN","GBPTRY","GBPZAR","GBPPLN","TRYJPY","ZARJPY","XAUUSD","XAGUSD","XPTUSD","XPDUSD"]);
+
+    let currentMarket = "moex", currentFxMode = "classic", specs = {}, cbrRate = null;
+    const $ = id => document.getElementById(id);
+
+    // === ИНИЦИАЛИЗАЦИЯ ===
+    window.onload = function() {
+      loadSpecs();
+      setupTabs();
+      setupToggles();
+      renderInstruments();
+      initGridOrders(3);
+      updateDepositLabel();
+      $("instrument").addEventListener("change", updateMoexSpecUI);
+      updateMoexSpecUI();
+    };
+
+    function loadSpecs() { const saved = localStorage.getItem("traderSpecs"); const base = JSON.parse(JSON.stringify(DEFAULT_SPECS)); for (const g of Object.values(MOEX_GROUPS)) Object.assign(base.moex, g); specs = saved ? mergeSpecs(base, JSON.parse(saved)) : base; }
+    function mergeSpecs(base, overrides) { for (const m in overrides) { if (base[m]) base[m] = { ...base[m], ...overrides[m] }; else base[m] = overrides[m]; } return base; }
+    
+    function setupTabs() {
+      document.querySelectorAll(".tab").forEach(btn => { 
+        btn.onclick = () => { 
+          document.querySelectorAll(".tab").forEach(t => t.classList.remove("active")); 
+          btn.classList.add("active"); 
+          currentMarket = btn.dataset.m; 
+          updateMarketUI(); 
+          renderInstruments(); 
+        }; 
+      });
+      document.querySelectorAll(".mode-btn").forEach(btn => { 
+        btn.onclick = () => { 
+          document.querySelectorAll(".mode-btn").forEach(b => b.classList.remove("active")); 
+          btn.classList.add("active"); 
+          currentFxMode = btn.dataset.mode; 
+          updateMarketUI(); 
+        }; 
+      });
+    }
+    
+    function setupToggles() { 
+      document.querySelectorAll(".toggle-group").forEach(group => { 
+        group.querySelectorAll("button").forEach(btn => { 
+          btn.onclick = () => { 
+            group.querySelectorAll("button").forEach(b => b.classList.remove("active")); 
+            btn.classList.add("active"); 
+            updateHints(); 
+          }; 
+        }); 
+      }); 
+    }
+    
+    function getToggleValue(id) { return document.querySelector(`#${id} button.active`).dataset.v; }
+    function updateHints() { 
+      const rType = getToggleValue("riskToggle"); 
+      $("riskHint").textContent = rType === "percent" ? "Будет рассчитано: X% от депозита" : "Будет рассчитано: фикс. сумма в ₽"; 
+      $("fxRiskHint").textContent = getToggleValue("fxRiskToggle") === "percent" ? "X% от депозита ($)" : "Фикс. сумма ($)"; 
+      $("riskInput").placeholder = rType === "percent" ? "1" : "500"; 
+      $("stopHint").textContent = getToggleValue("stopToggle") === "pct" ? "Дистанция стопа: X% от цены входа" : "Дистанция стопа: |Вход - Стоп|"; 
+      $("stopInput").placeholder = getToggleValue("stopToggle") === "pct" ? "1.5" : "Цена стопа"; 
+    }
+    
+    function updateMarketUI() { 
+      document.querySelectorAll('.panel').forEach(p => p.classList.add('hidden')); 
+      if (currentMarket === 'moex') $('panel-moex').classList.remove('hidden'); 
+      else if (currentMarket === 'crypto') $('panel-crypto').classList.remove('hidden'); 
+      else if (currentMarket === 'forex') { 
+        if (currentFxMode === 'grid') $('panel-forex-grid').classList.remove('hidden'); 
+        else $('panel-forex-classic').classList.remove('hidden'); 
+      } 
+    }
+    
+    function renderInstruments() {
+      const moexSel = $("instrument"); if (moexSel) { moexSel.innerHTML = ""; for (const [gn, inst] of Object.entries(MOEX_GROUPS)) { const og = document.createElement("optgroup"); og.label = gn; for (const [c, v] of Object.entries(inst)) { const o = document.createElement("option"); o.value = c; o.textContent = `${c} — ${v.name}`; og.appendChild(o); } moexSel.appendChild(og); } }
+      const cryptoSel = $("cryptoInstrument"); if (cryptoSel) { cryptoSel.innerHTML = ""; Object.entries(specs.crypto || {}).forEach(([k, v]) => { const o = document.createElement("option"); o.value = k; o.textContent = k; cryptoSel.appendChild(o); }); }
+      const fxSel = $("fxPair"), gridSel = $("gridPair"); if (fxSel) { fxSel.innerHTML = ""; const grps = { "💱 Мажоры": ["EURUSD","GBPUSD","USDJPY","USDCHF","AUDUSD","USDCAD","NZDUSD"], "💱 Кроссы": ["EURGBP","EURJPY","EURCHF","EURAUD","EURCAD","GBPJPY","GBPCHF","AUDJPY","AUDCAD","CADJPY","NZDJPY"], "🌍 Экзотика": ["USDTRY","USDZAR","USDMXN","USDSEK","USDNOK","USDPLN","USDCZK","USDHUF","USDILS","USDSGD","USDHKD","USDRUB","EURTRY","EURZAR","EURPLN","GBPTRY","GBPZAR","GBPPLN","TRYJPY","ZARJPY"], "🥇 Металлы": ["XAUUSD","XAGUSD","XPTUSD","XPDUSD"], "🛢️ Товары": ["#WTI"] }; for (const [gn, ps] of Object.entries(grps)) { const og = document.createElement("optgroup"); og.label = gn; for (const p of ps) { if (specs.forex[p] || BROKER_PROFILES.bcs?.instruments?.[p]) { const o = document.createElement("option"); o.value = p; o.textContent = p; og.appendChild(o); } } fxSel.appendChild(og); } } if (gridSel) gridSel.innerHTML = fxSel?.innerHTML || ""; if (currentMarket === "moex") $("instrument").dispatchEvent(new Event("change")); if (currentMarket === "forex") { if (fxSel) fxSel.dispatchEvent(new Event("change")); if (gridSel) gridSel.dispatchEvent(new Event("change")); }
+    }
+
+    function updateDepositLabel() {
+      const cur = $("fxAccCur").value;
+      $("lblDeposit").textContent = (cur === 'RUB') ? "Депозит (₽)" : "Депозит ($)";
+    }
+
+    // === ОБНОВЛЕНИЕ СПЕЦИФИКАЦИЙ (БЕЗ КУРСА) ===
+    function updateMoexSpecUI() { 
+      const spec = getSpec(); 
+      if (!spec) return; 
+      let sv = spec.stepValue || 0; 
+      $("specStep").textContent = spec.step; 
+      $("specStepValue").textContent = `${sv.toFixed(2)} ₽`; 
+      $("specLot").textContent = spec.lot; 
+      $("specGo").textContent = `${spec.go} ₽`; 
+      $("specStatus").innerHTML = `<span class="status ${spec.status === 'active' ? 'active' : 'suspended'}">${spec.status === 'active' ? 'Активен' : 'Приостановлен'}</span>`; 
+    }
+    function getSpec() { const key = currentMarket === "moex" ? $("instrument").value : currentMarket === "crypto" ? $("cryptoInstrument").value : $("fxPair")?.value; return specs[currentMarket]?.[key]; }
+    
+    async function fetchCBR() { 
+      $("cbrStatus").textContent = "⏳ Загрузка..."; 
+      $("cbrStatus").className = "status-msg"; 
+      try { 
+        const res = await fetch("https://www.cbr-xml-daily.ru/daily_json.js"); 
+        const data = await res.json(); 
+        cbrRate = data.Valute.USD.Value; 
+        $("cbrStatus").textContent = `✅ Курс USD/RUB ЦБ: ${cbrRate.toFixed(2)} ₽`; 
+        $("cbrStatus").className = "status-msg ok"; 
+      } catch(e) { 
+        $("cbrStatus").textContent = "⚠️ Ошибка загрузки"; 
+        $("cbrStatus").className = "status-msg err"; 
+      } 
+    }
+
+    async function fetchFromMoex() { 
+      const code = $("instrument").value; 
+      $("cbrStatus").textContent = "⏳ MOEX API..."; 
+      $("cbrStatus").className = "status-msg"; 
+      try { 
+        const res = await fetch(`https://iss.moex.com/iss/engines/futures/markets/indicators/securities/${code}.json`); 
+        if (!res.ok) throw new Error("HTTP " + res.status); 
+        const data = await res.json(); 
+        const cols = data.securities.columns; 
+        const row = data.securities.data[0]; 
+        const get = name => row[cols.indexOf(name)]; 
+        specs[currentMarket][code] = { ...specs[currentMarket][code], step: parseFloat(get("MINSTEP"))||specs[currentMarket][code].step, stepValue: parseFloat(get("STEP_PRICE"))||specs[currentMarket][code].stepValue, lot: parseInt(get("LOTSIZE"))||specs[currentMarket][code].lot, go: parseInt(get("GO_BASE"))||specs[currentMarket][code].go, currency: "RUB", status: "active", name: get("SECNAME")||specs[currentMarket][code].name, source: "api" }; 
+        saveSpecs(); 
+        $("instrument").dispatchEvent(new Event("change")); 
+        $("cbrStatus").textContent = "✅ Спеки MOEX обновлены"; 
+        $("cbrStatus").className = "status-msg ok"; 
+      } catch(e) { 
+        $("cbrStatus").textContent = "⚠️ Ошибка API"; 
+        $("cbrStatus").className = "status-msg err"; 
+      } 
+    }
+    function saveSpecs() { localStorage.setItem("traderSpecs", JSON.stringify(specs)); }
+    
+    // === РЕДАКТИРОВАНИЕ ===
+    function openEditor() { 
+      const spec = getSpec(); 
+      if (!spec) return alert("Сначала выберите инструмент!"); 
+      $("editStep").value = spec.step; 
+      $("editStepValue").value = spec.stepValue; 
+      $("editLot").value = spec.lot; 
+      $("editGo").value = spec.go; 
+      $("editModal").classList.remove("hidden"); 
+    }
+    function saveManualSpec() { 
+      const key = $("instrument").value; 
+      specs.moex[key] = { 
+        ...specs.moex[key], 
+        step: parseFloat($("editStep").value), 
+        stepValue: parseFloat($("editStepValue").value), 
+        lot: parseInt($("editLot").value), 
+        go: parseInt($("editGo").value), 
+        source: "manual" 
+      }; 
+      saveSpecs(); 
+      $("editModal").classList.add("hidden"); 
+      updateMoexSpecUI(); 
+      alert("✅ Спецификации сохранены и обновлены!");
+    }
+
+    function updateForexUI() { 
+      const broker = $("fxBroker").value; const account = $("fxAccount").value; 
+      $("swapFreeRow").classList.toggle("hidden", broker !== "roboforex"); $("swapFreeWarn").classList.add("hidden"); 
+      if (broker === "roboforex") { 
+        const pair = $("fxPair").value; const isEligible = SWAP_FREE_INSTRUMENTS.has(pair); 
+        if ($("fxSwapFree").checked && isEligible) { $("swapFreeBadge").textContent = "🟢 Без свопов"; $("swapFreeBadge").className = "badge green"; $("swapFreeWarn").classList.add("hidden"); } 
+        else if ($("fxSwapFree").checked && !isEligible) { $("swapFreeBadge").textContent = "⚠️ Не входит"; $("swapFreeBadge").className = "badge orange"; $("swapFreeWarn").classList.remove("hidden"); } 
+        else { $("swapFreeBadge").textContent = ""; $("swapFreeWarn").classList.add("hidden"); } 
+      }
+      const pair = $("fxPair").value; const accType = ACCOUNT_TYPES[account] || ACCOUNT_TYPES.standard; const pairSpec = getPairSpec(pair, broker); $("fxInfoBox").textContent = `💡 ${accType.label}: 1 лот = ${accType.lotSize.toLocaleString()} ед. | Пункт ≈ $${(pairSpec.pipValueUSD).toFixed(2)}`; if (broker === "bcs") { const bcsInstr = BROKER_PROFILES.bcs?.instruments?.[pair]; if (bcsInstr) $("fxSpread").value = bcsInstr.spread; } 
+    }
+    
+    function getPairSpec(pair, broker) { if (specs.forex[pair]) return specs.forex[pair]; if (broker === "bcs" && BROKER_PROFILES.bcs?.instruments?.[pair]) { return { pip: BROKER_PROFILES.bcs.instruments[pair].pip || 0.00001, pipValueUSD: BROKER_PROFILES.bcs.instruments[pair].pipValueUSD || 1.0 }; } if (pair.includes("JPY") || pair.includes("XAU")) return { pip: 0.01, pipValueUSD: 1.0 }; return { pip: 0.00001, pipValueUSD: 1.0 }; }
+    
+    $("fxPair").addEventListener("change", updateForexUI);
+    $("fxBroker").addEventListener("change", updateForexUI);
+    $("fxAccount").addEventListener("change", updateForexUI);
+
+    function resetFxFees() { const broker = $("fxBroker").value; const account = $("fxAccount").value; const pair = $("fxPair").value; const prof = BROKER_PROFILES[broker]?.[account] || BROKER_PROFILES[broker] || BROKER_PROFILES.custom; $("fxSpread").value = prof.spread; $("fxComm").value = prof.commPerLot; }
+
+    // === РАСЧЁТ МОСБИРЖИ ===
+    function runMoexCalc() { 
+      try {
+        const spec = getSpec();
+        if (!spec) return alert("Выберите инструмент!");
+        
+        const dep = parseFloat($("deposit").value) || 0;
+        const rType = getToggleValue("riskToggle");
+        const riskVal = parseFloat($("riskInput").value) || 0;
+        const entry = parseFloat($("entry").value) || 0;
+        const sType = getToggleValue("stopToggle");
+        const stopVal = parseFloat($("stopInput").value) || 0;
+        const tpVal = parseFloat($("tpInput").value) || 0;
+
+        if (!entry || dep <= 0) return alert("Заполните депозит и цену входа!");
+
+        let riskAmount = rType === "percent" ? dep * (riskVal / 100) : riskVal;
+        let stopDist = sType === "pct" ? entry * (stopVal / 100) : Math.abs(entry - stopVal);
+        if (stopDist <= 0) return alert("Проверьте стоп-лосс!");
+
+        let sv = spec.stepValue || 0;
+        
+        const stepsInStop = stopDist / spec.step;
+        const riskPerContract = stepsInStop * sv;
+        const contracts = Math.floor(riskAmount / riskPerContract);
+
+        if (contracts < 1) return alert("Недостаточно средств для 1 контракта при таком риске!");
+
+        const actualRisk = contracts * riskPerContract;
+        const margin = spec.go * contracts;
+
+        $("rSize").textContent = `${contracts} фьюч.`;
+        $("rMargin").textContent = `${margin.toFixed(0)} ₽`;
+        $("rPipVal").textContent = `${sv.toFixed(2)} ₽/шаг`;
+        $("rSpread").textContent = "0 ₽";
+        $("rComm").textContent = "0 ₽";
+        $("rSwap").textContent = "0 ₽";
+        $("rGrossRisk").textContent = `${actualRisk.toFixed(0)} ₽`;
+        $("rNetRisk").textContent = `${actualRisk.toFixed(0)} ₽`;
+
+        if (tpVal && tpVal !== entry) {
+          const tpDist = Math.abs(tpVal - entry);
+          const tpPnl = contracts * (tpDist / spec.step) * sv;
+          const rr = tpDist / stopDist;
+          $("tpRow").classList.remove("hidden");
+          $("rNetTP").textContent = `+${tpPnl.toFixed(0)} ₽`;
+          $("rrRow").classList.remove("hidden");
+          $("rrRow").textContent = `1 : ${rr.toFixed(2)}`;
+        } else {
+          $("tpRow").classList.add("hidden");
+          $("rrRow").classList.add("hidden");
+        }
+        $("results").classList.remove("hidden");
+      } catch(e) { alert("Ошибка расчёта: " + e.message); }
+    }
+
+    // === ИСПРАВЛЕННЫЙ РАСЧЁТ КРИПТО ===
+    function runCryptoCalc() {
+      try {
+        const dep = parseFloat($("cryptoDeposit").value);
+        const rType = getToggleValue("cryptoRiskToggle");
+        const riskVal = parseFloat($("cryptoRiskInput").value);
+        const entry = parseFloat($("cryptoEntry").value);
+        const stop = parseFloat($("cryptoStop").value);
+        const tp = parseFloat($("cryptoTP").value);
+        const lev = parseFloat($("cryptoLeverage").value);
+
+        if(!dep || !entry || !stop) return alert("Заполни Депозит, Вход и Стоп!");
+        if(stop === entry) return alert("Стоп не может быть равен Входу!");
+
+        // ИСПРАВЛЕНИЕ: Правильно определяем риск
+        let riskAmt;
+        if (rType === "percent") {
+            riskAmt = dep * (riskVal / 100);
+        } else {
+            riskAmt = riskVal; // Фиксированная сумма
+        }
+        
+        const stopDist = Math.abs(entry - stop);
+        const isLong = stop < entry;
+        
+        // Размер позиции в монетах
+        const size = riskAmt / stopDist; 
+        
+        // Маржа
+        const margin = (size * entry) / lev; 
+        
+        let pnlTP = 0;
+        let rr = 0;
+
+        if(tp && tp !== 0) {
+            const tpDist = Math.abs(tp - entry);
+            const tpInRightDirection = isLong ? (tp > entry) : (tp < entry);
+            
+            if(tpInRightDirection) {
+                pnlTP = size * tpDist;
+            } else {
+                pnlTP = -(size * tpDist);
+            }
+            rr = Math.abs(pnlTP) / riskAmt;
+        }
+
+        $("rSize").textContent = size.toFixed(6) + " монет";
+        $("rMargin").textContent = margin.toFixed(2) + " USDT";
+        $("rPipVal").textContent = size.toFixed(6) + " USDT/пункт"; 
+        $("rSpread").textContent = "-"; 
+        $("rComm").textContent = "-";
+        $("rSwap").textContent = "x" + lev; 
+        $("rGrossRisk").textContent = riskAmt.toFixed(2) + " USDT";
+        $("rNetRisk").textContent = margin.toFixed(2) + " USDT"; 
+
+        if(tp && tp !== 0) {
+            $("tpRow").classList.remove("hidden");
+            $("rrRow").classList.remove("hidden");
+            const sign = pnlTP >= 0 ? "+" : "";
+            $("rNetTP").textContent = sign + pnlTP.toFixed(2) + " USDT";
+            $("rRR").textContent = "1 : " + rr.toFixed(2);
+        } else {
+            $("tpRow").classList.add("hidden");
+            $("rrRow").classList.add("hidden");
+        }
+        
+        $("results").classList.remove("hidden");
+
+      } catch(e) { alert("Ошибка: " + e.message); }
+    }
+
+    // === FOREX ===
+    function calcForex() { 
+      try {
+        const fixDecimal = (val) => typeof val === 'string' ? val.replace(',', '.') : val;
+        $("fxEntry").value = fixDecimal($("fxEntry").value); $("fxStop").value = fixDecimal($("fxStop").value);
+        $("fxTP").value = fixDecimal($("fxTP").value); $("fxDeposit").value = fixDecimal($("fxDeposit").value);
+        $("fxRiskInput").value = fixDecimal($("fxRiskInput").value);
+
+        const broker = $("fxBroker").value; const account = $("fxAccount").value; const pair = $("fxPair").value;
+        if (!pair) return alert("❌ Выберите валютную пару!");
+        
+        const accCur = $("fxAccCur").value; const direction = getToggleValue("fxDirToggle");
+        const dep = parseFloat($("fxDeposit").value) || 0; const rType = getToggleValue("fxRiskToggle");
+        const riskVal = parseFloat($("fxRiskInput").value) || 0; const entry = parseFloat($("fxEntry").value) || 0;
+        const stop = parseFloat($("fxStop").value) || 0; const tp = parseFloat($("fxTP").value) || 0;
+        const lev = parseFloat($("fxLeverage").value) || 1; const nights = parseInt($("fxNights").value) || 0;
+        const isWed = $("fxWedSwap").checked;
+        const isSwapFree = $("fxSwapFree").checked && broker === "roboforex" && SWAP_FREE_INSTRUMENTS.has(pair);
+        const showInAccountLots = $("fxLotToggle").checked;
+
+        if (!entry || !stop || entry === stop || dep <= 0) return alert("Заполните цены входа, стопа и депозит корректно!");
+
+        const riskAmountLocal = rType === "percent" ? dep * (riskVal / 100) : riskVal;
+        const pairSpec = getPairSpec(pair, broker);
+        const pipSize = pairSpec.pip;
+        const pipValueUSD = pairSpec.pipValueUSD;
+        const stopDistPips = Math.abs(entry - stop) / pipSize;
+        
+        const rate = (accCur === 'RUB') ? (cbrRate || 90) : 1;
+        const riskAmountUSD = riskAmountLocal / rate;
+        
+        let lotsStandard = riskAmountUSD / (stopDistPips * pipValueUSD);
+        lotsStandard = Math.max(0.01, Math.round(lotsStandard * 100) / 100);
+        
+        let lotsDisplay = lotsStandard;
+        if (showInAccountLots && account === 'procent') lotsDisplay = lotsStandard * 100;
+
+        const actualRiskUSD = lotsStandard * stopDistPips * pipValueUSD;
+        let pipValueDisplay = pipValueUSD;
+        if (showInAccountLots && account === 'procent') pipValueDisplay = pipValueUSD / 100;
+
+        const spread = parseFloat($("fxSpread").value) || 0;
+        const comm = parseFloat($("fxComm").value) || 0;
+        const spreadCost = (spread * pipValueDisplay) * lotsDisplay;
+        const commission = (comm * 2) * lotsDisplay;
+
+        let swapRateLong = 0, swapRateShort = 0;
+        if (broker === "bcs") {
+          const bcsInstr = BROKER_PROFILES.bcs?.instruments?.[pair];
+          if (bcsInstr) { swapRateLong = bcsInstr.swapLong; swapRateShort = bcsInstr.swapShort; }
+        } else {
+          const prof = BROKER_PROFILES[broker]?.[account] || BROKER_PROFILES[broker] || BROKER_PROFILES.custom;
+          swapRateLong = prof.swapLong; swapRateShort = prof.swapShort;
+        }
+        let swapTotal = 0;
+        if (!isSwapFree) {
+          const swapRate = direction === "long" ? swapRateLong : swapRateShort;
+          let actualNights = nights; if (isWed && nights > 0) actualNights += 2;
+          swapTotal = swapRate * lotsStandard * actualNights;
+        }
+
+        let marginUSD = (entry * lotsStandard * 100000) / lev;
+        if (showInAccountLots && account === 'procent') marginUSD = marginUSD / 100;
+
+        const netRiskUSD = actualRiskUSD + spreadCost + commission + Math.max(0, -swapTotal);
+
+        let tpPnlNet = 0, rr = 0;
+        if (tp && tp !== entry) {
+          const tpDist = Math.abs(tp - entry); const tpDistPips = tpDist / pipSize;
+          const grossTP = tpDistPips * pipValueDisplay * lotsDisplay;
+          tpPnlNet = grossTP - spreadCost - commission - Math.max(0, -swapTotal);
+          rr = tpPnlNet / netRiskUSD;
+        }
+
+        const currency = (accCur === 'RUB') ? '₽' : '$';
+        const lotUnit = (showInAccountLots && account === 'procent') ? 'лотов (ProCent)' : 'станд. лотов';
+        
+        $("rSize").textContent = `${lotsDisplay.toFixed(2)} ${lotUnit}`; 
+        $("rMargin").textContent = `${(marginUSD * rate).toFixed(2)} ${currency}`;
+        $("rPipVal").textContent = `${(pipValueDisplay * rate).toFixed(4)} ${currency}`; 
+        $("rSpread").textContent = `${(spreadCost * rate).toFixed(2)} ${currency}`;
+        $("rComm").textContent = `${(commission * rate).toFixed(2)} ${currency}`; 
+        $("rSwap").textContent = `${(swapTotal * rate).toFixed(2)} ${currency}`;
+        $("rGrossRisk").textContent = `${(actualRiskUSD * rate).toFixed(2)} ${currency}`; 
+        $("rNetRisk").textContent = `${(netRiskUSD * rate).toFixed(2)} ${currency}`;
+        
+        if (tp && tp !== entry) { $("tpRow").classList.remove("hidden"); $("rNetTP").textContent = `${(tpPnlNet*rate)>=0?'+':''}${(tpPnlNet*rate).toFixed(2)} ${currency}`; $("rrRow").classList.remove("hidden"); $("rRR").textContent = `1 : ${rr.toFixed(2)}`; }
+        else { $("tpRow").classList.add("hidden"); $("rrRow").classList.add("hidden"); }
+        
+        $("results").classList.remove("hidden");
+      } catch (e) { alert("Ошибка: " + e.message); }
+    }
+
+    // === СЕТКА ===
+    function initGridOrders(count) { $("gridOrdersContainer").innerHTML = ""; for(let i=0; i<count; i++) addOrderRow(); }
+    function addOrderRow() { const list = $("gridOrdersContainer"); if (list.children.length >= 10) return; const c = list.children.length + 1; const row = document.createElement("div"); row.className = "row-4"; row.style.cssText = "border-bottom:1px solid #334155; padding-bottom:6px;"; row.innerHTML = `<div style="font-size:0.8rem; color:var(--muted)">#${c}</div><div><div class="fee-label">Множитель</div><input type="number" class="order-input inp-mult" value="${(1 + (c-1)*0.5).toFixed(1)}" step="0.1"></div><div><div class="fee-label">SL (пипсы)</div><input type="number" class="order-input inp-sl" value="${$("gridGlobalSL").value}"></div><div><div class="fee-label">TP (пипсы)</div><input type="number" class="order-input inp-tp"></div><button class="remove-btn" onclick="this.parentElement.remove()">×</button>`; list.appendChild(row); }
+    function removeOrderRow() { const list = $("gridOrdersContainer"); if (list.children.length > 1) list.removeChild(list.lastChild); }
+    function calcCoefficient() { const m = Array.from(document.querySelectorAll(".inp-mult")).map(i => parseFloat(i.value) || 0); $("gridCoefficient").value = m.reduce((a, b) => a + b, 0).toFixed(2); }
+    
+    // === ИСПРАВЛЕННЫЙ РАСЧЁТ СЕТКИ ===
+    function calcGrid() {
+      try {
+        const pair = $("gridPair").value;
+        const dep = parseFloat($("gridDeposit").value) || 0;
+        const riskPct = parseFloat($("gridRisk").value) || 0;
+        const direction = getToggleValue("gridDirToggle");
+        const globalSLPips = parseFloat($("gridGlobalSL").value) || 0;
+        const coefficient = parseFloat($("gridCoefficient").value) || 1;
+        const stepPips = parseFloat($("gridStep").value) || 100;
+        const entry = parseFloat($("gridEntry").value);
+        const leverage = parseFloat($("gridLeverage").value) || 100;
+        const useSwap = $("gridSwapCheck").checked;
+        const swapLong = parseFloat($("gridSwapLong").value) || 0;
+        const swapShort = parseFloat($("gridSwapShort").value) || 0;
+        const nights = parseInt($("gridNights").value) || 0;
+        const showInAccountLots = $("gridLotToggle").checked;
+
+        if (!entry || dep <= 0) return alert("Заполните депозит и цену входа");
+        if (globalSLPips <= 0) return alert("Укажите Stop Loss сетки");
+
+        const pairSpec = getPairSpec(pair, "bcs");
+        const pipSize = pairSpec.pip;
+        const pipValueStandard = pairSpec.pipValueUSD;
+        
+        const targetRisk = dep * (riskPct / 100);
+        const riskPerUnitPct = riskPct / coefficient;
+        const riskPerUnitAmount = dep * (riskPerUnitPct / 100);
+        
+        let baseLotStandard = riskPerUnitAmount / (globalSLPips * pipValueStandard);
+        baseLotStandard = Math.max(0.01, Math.round(baseLotStandard * 100) / 100);
+        
+        const rows = Array.from(document.querySelectorAll("#gridOrdersContainer .row-4"));
+        const orders = [];
+        let totalLots = 0, weightedSum = 0, totalMargin = 0, totalRiskCalc = 0;
+        
+        rows.forEach((row, i) => {
+          const mult = parseFloat(row.querySelector(".inp-mult").value) || 1;
+          const slPipsInput = parseFloat(row.querySelector(".inp-sl").value);
+          const tpPipsInput = parseFloat(row.querySelector(".inp-tp").value);
+          const slPipsUsed = !isNaN(slPipsInput) ? slPipsInput : globalSLPips;
+          
+          const price = direction === "long" ? entry - (stepPips * i * pipSize) : entry + (stepPips * i * pipSize);
+          const lotStandard = baseLotStandard * mult;
+          const lotDisplay = showInAccountLots ? lotStandard * 100 : lotStandard;
+          
+          totalRiskCalc += lotStandard * slPipsUsed * pipValueStandard;
+          
+          let slPrice = "-";
+          if (!isNaN(slPipsInput) || slPipsUsed === globalSLPips) {
+            slPrice = (direction === "long" ? price - (slPipsUsed * pipSize) : price + (slPipsUsed * pipSize)).toFixed(5);
+          }
+          
+          let tpPrice = "-";
+          if (!isNaN(tpPipsInput)) {
+            tpPrice = (direction === "long" ? price + (tpPipsInput * pipSize) : price - (tpPipsInput * pipSize)).toFixed(5);
+          }
+          
+          const margin = (price * lotStandard * 100000) / leverage;
+          orders.push({ num: i+1, price, lot: lotDisplay, slPrice, tpPrice, margin });
+          totalLots += lotDisplay;
+          weightedSum += lotStandard * price;
+          totalMargin += margin;
+        });
+        
+        const avgEntry = weightedSum / (totalLots / (showInAccountLots ? 100 : 1));
+        const globalSLPrice = (direction === "long" ? entry - (globalSLPips * pipSize) : entry + (globalSLPips * pipSize)).toFixed(5);
+        
+        let swapTotal = 0;
+        if (useSwap) {
+          const swapRate = direction === "long" ? swapLong : swapShort;
+          for (const o of orders) swapTotal += (o.lot / (showInAccountLots ? 100 : 1)) * swapRate * nights;
+        }
+        
+        const tbody = $("gridTableBody");
+        tbody.innerHTML = "";
+        orders.forEach(o => {
+          tbody.innerHTML += `<tr><td>${o.num}</td><td>${o.price.toFixed(5)}</td><td class="val">${o.lot.toFixed(2)}</td><td style="color:var(--accent)">${o.num === 1 ? '—' : (o.lot > orders[o.num-2].lot ? '+' : '') + (o.lot - orders[o.num-2].lot).toFixed(2)}</td><td style="color:var(--red)">${o.slPrice}</td><td style="color:var(--green)">${o.tpPrice}</td></tr>`;
+        });
+        tbody.innerHTML += `<tr style="background:#1e1e24; border-top:2px solid var(--red)"><td colspan="3" style="color:var(--red); font-weight:bold; padding:8px">🛑 СТОП СЕТКИ</td><td>-</td><td colspan="2" style="color:var(--red); font-weight:bold">${globalSLPrice}</td></tr>`;
+        
+        $("gridTargetRisk").textContent = `$${targetRisk.toFixed(2)} (${riskPct}%)`;
+        $("gridUnitRisk").textContent = `$${riskPerUnitAmount.toFixed(2)} (${riskPerUnitPct.toFixed(2)}%)`;
+        $("gridTotalRisk").textContent = `$${totalRiskCalc.toFixed(2)}`;
+        $("gridTotalLots").textContent = `${totalLots.toFixed(2)} ${showInAccountLots ? 'лотов (ProCent)' : 'станд. лотов'}`;
+        $("gridAvgEntry").textContent = avgEntry.toFixed(5);
+        $("gridMargin").textContent = `$${totalMargin.toFixed(2)}`;
+        $("gridSwapTotal").textContent = `$${swapTotal.toFixed(2)}`;
+        $("gridSwapRowRes").classList.toggle("hidden", !useSwap);
+        
+        // ИСПРАВЛЕНИЕ: Показываем результаты
+        $("gridResults").classList.remove("hidden");
+        window.gridExportData = { orders, pair, direction, avgEntry, slPrice: globalSLPrice };
+        
+      } catch(e) { alert("Ошибка: " + e.message); }
+    }
+    
+    function copyGridLevels() { 
+      if (!window.gridExportData) return; 
+      const { orders, pair, direction, avgEntry, slPrice } = window.gridExportData; 
+      let text = `# Grid: ${pair} ${direction.toUpperCase()}\n# Avg Entry: ${avgEntry.toFixed(5)} | Global SL: ${slPrice}\n\n`; 
+      orders.forEach(o => { 
+        const type = direction === "long" ? "BUY LIMIT" : "SELL LIMIT"; 
+        const lotForExport = o.lot / ($("gridLotToggle").checked ? 100 : 1); 
+        text += `${type} ${lotForExport.toFixed(2)} ${pair} @ ${o.price.toFixed(5)}\n`; 
+      }); 
+      text += `\nSTOP LOSS: ${slPrice}`; 
+      navigator.clipboard.writeText(text).then(() => { 
+        const btn = $("gridCopyBtn"); 
+        btn.textContent = "✅ Скопировано!"; 
+        btn.classList.add("copied"); 
+        setTimeout(() => { btn.textContent = "📋 Копировать уровни для терминала"; btn.classList.remove("copied"); }, 2000); 
+      }).catch(() => alert("Не удалось скопировать.")); 
+    }
+
+    // === УТИЛИТЫ ===
+    function exportSettings() { const d = localStorage.getItem("traderSpecs"); if(!d) return alert("Нет данных"); const b = new Blob([d], {type:"application/json"}); const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = "specs.json"; a.click(); }
+    function importSettings(inp) { const f = inp.files[0]; if(!f) return; const r = new FileReader(); r.onload = e => { try { localStorage.setItem("traderSpecs", e.target.result); location.reload(); } catch(err) { alert("Ошибка файла"); } }; r.readAsText(f); }
+  </script>
+  <script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js');
+    });
+  }
+  </script>
+</body>
+</html>
