@@ -896,11 +896,12 @@
     function importSettings(inp) { const f = inp.files[0]; if(!f) return; const r = new FileReader(); r.onload = e => { try { localStorage.setItem("traderSpecs", e.target.result); location.reload(); } catch(err) { alert("Ошибка файла"); } }; r.readAsText(f); }
   </script>
   <script>
-  //  if ('serviceWorker' in navigator) {
-  //    window.addEventListener('load', () => {
-  //      navigator.serviceWorker.register('./sw.js');
-  //    });
-  //  }
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js');
+    });
+  }
+</script>
 </script>
 </body>
   <div style="position:fixed; top:5px; right:5px; background:#ef4444; color:white; padding:4px 8px; border-radius:4px; font-size:12px; z-index:9999; font-weight:bold;">✅ ВЕРСИЯ: НОВАЯ (riskAmt)</div>
