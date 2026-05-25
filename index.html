@@ -655,11 +655,11 @@
         $("rSize").textContent = size.toFixed(6) + " монет";
         $("rMargin").textContent = margin.toFixed(2) + " USDT";
         $("rPipVal").textContent = size.toFixed(6) + " USDT/пункт"; 
-        $("rSpread").textContent = "-"; 
+        $ ("rSpread").textContent = "-"; 
         $("rComm").textContent = "-";
         $("rSwap").textContent = "x" + lev; 
         $("rGrossRisk").textContent = riskAmt.toFixed(2) + " USDT";
-        $("rNetRisk").textContent = margin.toFixed(2) + " USDT"; 
+        $("rNetRisk").textContent = riskAmt.toFixed(2) + " USDT";
 
         if(tp && tp !== 0) {
             $("tpRow").classList.remove("hidden");
