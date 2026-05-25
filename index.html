@@ -836,7 +836,10 @@
           
           const margin = (price * lotStandard * 100000) / leverage;
           orders.push({ num: i+1, price, lot: lotDisplay, slPrice, tpPrice, margin });
-          totalLots += lotDisplay;
+          // Общий объём = размер последнего ордера (итоговая позиция)
+          if (i === rows.length - 1) {
+          totalLots = lotDisplay;
+          }
           weightedSum += lotStandard * price;
           totalMargin += margin;
         });
