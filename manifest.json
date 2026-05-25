@@ -1,8 +1,15 @@
 {
-  "name": "Trader Calculator",
-  "short_name": "Trader",
+  "name": "Калькулятор трейдера",
+  "short_name": "Трейдер",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#0b0f19",
-  "theme_color": "#0b0f19"
+  "theme_color": "#0b0f19",
+  "icons": [
+    {
+      "src": "https://ui-avatars.com/api/?name=Trade+Calc&background=3b82f6&color=fff&size=512",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
 }
