@@ -34,8 +34,11 @@
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e9ecef; }
         th { background: #f8f9fa; font-weight: 600; color: #495057; }
-        .checkbox-wrapper { display: flex; align-items: center; gap: 10px; }
+        .checkbox-wrapper { display: flex; align-items: center; gap: 10px; margin: 10px 0; }
         .checkbox-wrapper input[type="checkbox"] { width: auto; }
+        .radio-group { display: flex; gap: 15px; margin: 15px 0; }
+        .radio-group label { display: flex; align-items: center; gap: 5px; cursor: pointer; font-weight: normal; }
+        .radio-group input[type="radio"] { width: auto; }
         @media (max-width: 768px) { .row { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -142,11 +145,9 @@
                 </div>
 
                 <!-- НОВОЕ: ЧЕКБОКС ДЛЯ ПУНКТОВ -->
-                <div class="form-group">
-                    <div class="checkbox-wrapper">
-                        <input type="checkbox" id="usePointsToggle" onchange="togglePointsInput()">
-                        <label for="usePointsToggle" style="margin:0; cursor:pointer;">Рассчитывать SL/TP в пунктах от цены входа</label>
-                    </div>
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="usePointsToggle" onchange="togglePointsInput()">
+                    <label for="usePointsToggle" style="margin:0; cursor:pointer;">Рассчитывать SL/TP в пунктах от цены входа</label>
                 </div>
 
                 <!-- ПОЛЯ ДЛЯ ЦЕН (по умолчанию видны) -->
@@ -226,20 +227,42 @@
                 </div>
 
                 <!-- НОВЫЕ ПОЛЯ -->
-                <div class="row">
-                    <div class="form-group">
-                        <label>Шаг стопа от последнего уровня ($)</label>
-                        <input type="number" id="gridSlStep" value="10" step="0.01">
-                    </div>
-                    <div class="form-group">
-                        <label>Бюджет риска ($)</label>
-                        <input type="number" id="gridRiskBudget" value="40" step="0.01">
+                <div class="form-group">
+                    <label>Режим расчёта сетки:</label>
+                    <div class="radio-group">
+                        <label>
+                            <input type="radio" name="gridMode" value="coefficient" checked onchange="toggleGridMode()">
+                            По коэффициенту (старый режим)
+                        </label>
+                        <label>
+                            <input type="radio" name="gridMode" value="budget" onchange="toggleGridMode()">
+                            По общему риску (новый режим)
+                        </label>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label>Коэффициент (сумма)</label>
-                    <input type="number" id="gridCoefficient" value="1" step="0.1">
+                <!-- Поля для режима "по коэффициенту" -->
+                <div id="coefficientFields">
+                    <div class="row">
+                        <div class="form-group">
+                            <label>Коэффициент (сумма)</label>
+                            <input type="number" id="gridCoefficient" value="1" step="0.1">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Поля для режима "по бюджету" -->
+                <div id="budgetFields" style="display:none;">
+                    <div class="row">
+                        <div class="form-group">
+                            <label>Шаг стопа от последнего уровня ($)</label>
+                            <input type="number" id="gridSlStep" value="10" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label>Бюджет риска ($)</label>
+                            <input type="number" id="gridRiskBudget" value="40" step="0.01">
+                        </div>
+                    </div>
                 </div>
 
                 <div id="gridLevelsContainer">
@@ -279,7 +302,14 @@
             document.getElementById('forexPointsInputs').style.display = usePoints ? 'block' : 'none';
         }
 
-        // РАСЧЁТ КЛАССИКИ FOREX
+        // НОВАЯ ФУНКЦИЯ: ПЕРЕКЛЮЧЕНИЕ РЕЖИМА СЕТКИ
+        function toggleGridMode() {
+            const mode = document.querySelector('input[name="gridMode"]:checked').value;
+            document.getElementById('coefficientFields').style.display = mode === 'coefficient' ? 'block' : 'none';
+            document.getElementById('budgetFields').style.display = mode === 'budget' ? 'block' : 'none';
+        }
+
+        // РАСЧЁТ КЛАССИКИ FOREX (ОБНОВЛЁННЫЙ)
         function calculateForexClassic() {
             const pair = document.getElementById('forexPair').value;
             const direction = document.getElementById('forexDirection').value;
@@ -346,13 +376,12 @@
             container.appendChild(div);
         }
 
-        // СЕТКА: РАСЧЁТ
+        // СЕТКА: РАСЧЁТ (ОБНОВЛЁННЫЙ С ДВУМЯ РЕЖИМАМИ)
         function calculateGrid() {
             const deposit = parseFloat(document.getElementById('gridDeposit').value);
             const riskPercent = parseFloat(document.getElementById('gridRisk').value);
-            const slStep = parseFloat(document.getElementById('gridSlStep').value);
-            const budget = parseFloat(document.getElementById('gridRiskBudget').value);
             const direction = document.getElementById('gridDirection').value;
+            const mode = document.querySelector('input[name="gridMode"]:checked').value;
             
             const prices = Array.from(document.querySelectorAll('.gridLevelPrice')).map(input => parseFloat(input.value));
             const tps = Array.from(document.querySelectorAll('.gridLevelTP')).map(input => parseFloat(input.value));
@@ -362,32 +391,53 @@
                 return;
             }
             
-            // Расчёт Grid SL
-            const lastPrice = prices[prices.length - 1];
-            const gridSL = direction === 'BUY' ? lastPrice - slStep : lastPrice + slStep;
-            
-            // Расчёт лотов и рисков
             let totalRisk = 0;
             let levelsData = [];
+            let gridSL = 0;
             
-            for (let i = 0; i < prices.length; i++) {
-                const dist = Math.abs(prices[i] - gridSL);
-                const baseLot = 0.01;
-                const lot = baseLot;
-                const risk = lot * dist * 100; // Для XAUUSD множитель 100
+            if (mode === 'coefficient') {
+                // СТАРЫЙ РЕЖИМ (по коэффициенту)
+                const coefficient = parseFloat(document.getElementById('gridCoefficient').value);
+                const riskPerUnit = riskPercent / coefficient;
                 
-                totalRisk += risk;
-                levelsData.push({ price: prices[i], tp: tps[i], lot, risk, dist });
-            }
-            
-            // Масштабирование под бюджет
-            if (totalRisk > budget) {
-                const scale = budget / totalRisk;
-                levelsData.forEach(lvl => {
-                    lvl.lot = parseFloat((lvl.lot * scale).toFixed(2));
-                    lvl.risk = lvl.lot * lvl.dist * 100;
-                });
-                totalRisk = levelsData.reduce((sum, l) => sum + l.risk, 0);
+                for (let i = 0; i < prices.length; i++) {
+                    const lot = 0.01 * (i + 1);
+                    const risk = lot * riskPerUnit * 100;
+                    totalRisk += risk;
+                    levelsData.push({ price: prices[i], tp: tps[i], lot, risk });
+                }
+                gridSL = prices[prices.length - 1] - 0.50; // Примерный SL
+            } else {
+                // НОВЫЙ РЕЖИМ (по бюджету риска)
+                const slStep = parseFloat(document.getElementById('gridSlStep').value);
+                const budget = parseFloat(document.getElementById('gridRiskBudget').value);
+                
+                // Расчёт Grid SL от последнего уровня
+                const lastPrice = prices[prices.length - 1];
+                gridSL = direction === 'BUY' ? lastPrice - slStep : lastPrice + slStep;
+                
+                // Расчёт лотов и рисков
+                let rawTotalRisk = 0;
+                for (let i = 0; i < prices.length; i++) {
+                    const dist = Math.abs(prices[i] - gridSL);
+                    const baseLot = 0.01;
+                    const risk = baseLot * dist * 100; // Для XAUUSD множитель 100
+                    
+                    rawTotalRisk += risk;
+                    levelsData.push({ price: prices[i], tp: tps[i], lot: baseLot, risk, dist });
+                }
+                
+                // Масштабирование под бюджет
+                if (rawTotalRisk > budget) {
+                    const scale = budget / rawTotalRisk;
+                    levelsData.forEach(lvl => {
+                        lvl.lot = parseFloat((lvl.lot * scale).toFixed(2));
+                        lvl.risk = lvl.lot * lvl.dist * 100;
+                    });
+                    totalRisk = levelsData.reduce((sum, l) => sum + l.risk, 0);
+                } else {
+                    totalRisk = rawTotalRisk;
+                }
             }
             
             // Вывод таблицы
@@ -404,11 +454,14 @@
             });
             table += '</table>';
             
+            const budget = mode === 'budget' ? parseFloat(document.getElementById('gridRiskBudget').value) : null;
+            const riskWarning = budget && totalRisk > budget ? '⚠️ Превышает бюджет!' : '✅';
+            
             const result = `
                 <h3>📋 Ордера сетки</h3>
                 ${table}
                 <div class="result-item"><span class="result-label">Общий стоп-лосс:</span><span class="result-value">${gridSL.toFixed(5)}</span></div>
-                <div class="result-item"><span class="result-label">Общий риск:</span><span class="result-value">$${totalRisk.toFixed(2)} ${totalRisk > budget ? '⚠️ Превышает бюджет!' : '✅'}</span></div>
+                <div class="result-item"><span class="result-label">Общий риск:</span><span class="result-value">$${totalRisk.toFixed(2)} ${riskWarning}</span></div>
             `;
             
             document.getElementById('gridResult').innerHTML = result;
