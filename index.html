@@ -68,7 +68,7 @@
         <button class="tab" onclick="switchTab('cb')">📈 Курс ЦБ РФ</button>
     </div>
 
-    <!-- MOEX -->
+    <!-- MOEX - БЕЗ ИЗМЕНЕНИЙ -->
     <div id="moex" class="tab-content active">
         <div class="row">
             <button class="btn btn-secondary" onclick="loadMOEXData()">📥 MOEX API</button>
@@ -105,7 +105,7 @@
         <div id="m-result" class="result-box hidden"></div>
     </div>
 
-    <!-- CRYPTO -->
+    <!-- CRYPTO - БЕЗ ИЗМЕНЕНИЙ -->
     <div id="crypto" class="tab-content">
         <div class="form-group"><label>Инструмент</label><select id="c-pair"><option>BTC/USDT</option><option>ETH/USDT</option><option>SOL/USDT</option></select></div>
         <div class="row">
@@ -368,7 +368,7 @@
         if (document.getElementById('fx-use-points').checked) {
             const slPts = parseFloat(document.getElementById('fx-sl-points').value);
             const tpPts = parseFloat(document.getElementById('fx-tp-points').value);
-            const ptVal = (pair.includes('JPY') || pair.includes('XAU') || pair.includes('XAG')) ? 0.01 : 0.0001; // Упрощено
+            const ptVal = (pair.includes('JPY') || pair.includes('XAU') || pair.includes('XAG')) ? 0.01 : 0.0001;
             
             if (dir === 'long') {
                 sl = entry - (slPts * ptVal);
@@ -389,11 +389,9 @@
         const contractSize = acc === 'cent' ? 1000 : 100000;
         const pointVal = (pair.includes('JPY') || pair.includes('XAU')) ? 0.01 : 0.00001;
         
-        // Упрощенная формула лота
         const lot = riskAmt / (dist / pointVal); 
         const margin = (lot * contractSize * entry) / lever;
 
-        // Результат
         const res = document.getElementById('fx-classic-result');
         res.classList.remove('hidden');
         res.innerHTML = `
@@ -444,28 +442,19 @@
         let gridSL, totalRisk = 0, lots = [];
 
         if (mode === 'coef') {
-            // Старый режим (Коэффициент)
             const slPips = parseFloat(document.getElementById('g-sl-pips').value);
             const coef = parseFloat(document.getElementById('g-coef').value);
-            // Упрощенная логика: просто пример
             gridSL = prices[0] - (slPips * 0.0001); 
             lots = prices.map((_, i) => 0.01 * (i + 1) * coef);
         } else {
-            // Новый режим (Общий риск)
             const step = parseFloat(document.getElementById('g-sl-step').value);
             const budget = parseFloat(document.getElementById('g-budget').value);
             const lastPrice = prices[prices.length - 1];
             
-            // Считаем Grid SL от последнего уровня
             gridSL = dir === 'buy' ? lastPrice - step : lastPrice + step;
 
-            // Расчет лотов под бюджет
-            // Риск = Lot * Dist * 100 (для XAU) или 10000 (для FX)
-            // Допустим множитель 100 для простоты (настраивается)
             let rawRisk = 0;
             const dists = prices.map(p => Math.abs(p - gridSL));
-            
-            // Базовый лот 0.01
             const baseLot = 0.01;
             dists.forEach(d => rawRisk += baseLot * d * 100); 
 
@@ -477,7 +466,6 @@
             });
         }
 
-        // Вывод
         const res = document.getElementById('g-result');
         res.classList.remove('hidden');
         let html = `<table><tr><th>#</th><th>Цена</th><th>Лот</th><th>SL</th><th>TP</th></tr>`;
@@ -495,8 +483,6 @@
         if (mode === 'budget') html += `<div class="result-row"><span>Итоговый риск</span><span class="result-value">$${totalRisk.toFixed(2)}</span></div>`;
         
         res.innerHTML = html;
-
-        // Сохраняем данные для экспорта
         window.gridExportData = { prices, lots, tps, gridSL, dir };
     }
 
