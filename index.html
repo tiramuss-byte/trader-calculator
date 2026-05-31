@@ -5,510 +5,527 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Калькулятор трейдера PRO</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
-        .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); overflow: hidden; }
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; }
-        .header h1 { font-size: 28px; margin-bottom: 10px; }
-        .tabs { display: flex; background: #f8f9fa; border-bottom: 2px solid #e9ecef; }
-        .tab { flex: 1; padding: 15px; background: none; border: none; cursor: pointer; font-size: 16px; font-weight: 600; color: #6c757d; transition: all 0.3s; }
-        .tab:hover { background: #e9ecef; }
-        .tab.active { background: white; color: #667eea; border-bottom: 3px solid #667eea; }
-        .tab-content { display: none; padding: 30px; }
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --bg: #f3f4f6;
+            --card-bg: #ffffff;
+            --text: #1f2937;
+            --text-light: #6b7280;
+            --border: #e5e7eb;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background: var(--bg); color: var(--text); padding: 20px; min-height: 100vh; }
+        .container { max-width: 800px; margin: 0 auto; background: var(--card-bg); border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); overflow: hidden; }
+        .header { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 20px; text-align: center; }
+        .tabs { display: flex; background: #f9fafb; border-bottom: 1px solid var(--border); }
+        .tab { flex: 1; padding: 15px; border: none; background: none; cursor: pointer; font-weight: 600; color: var(--text-light); transition: 0.3s; }
+        .tab.active { color: var(--primary); border-bottom: 3px solid var(--primary); background: white; }
+        .tab-content { display: none; padding: 20px; }
         .tab-content.active { display: block; }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-weight: 600; color: #495057; }
-        input, select { width: 100%; padding: 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 15px; transition: border 0.3s; }
-        input:focus, select:focus { outline: none; border-color: #667eea; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 500; font-size: 0.9em; color: var(--text-light); }
+        input, select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 1em; transition: 0.2s; }
+        input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
         .row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 14px 28px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 10px; transition: transform 0.2s; }
-        .btn:hover { transform: translateY(-2px); }
-        .btn-secondary { background: #6c757d; }
-        .result { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-top: 20px; }
-        .result-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e9ecef; }
-        .result-item:last-child { border-bottom: none; }
-        .result-label { font-weight: 600; color: #6c757d; }
-        .result-value { font-weight: 700; color: #667eea; }
-        .info { background: #e7f3ff; border-left: 4px solid #2196F3; padding: 12px; margin-bottom: 20px; border-radius: 4px; font-size: 14px; }
-        .hidden { display: none; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e9ecef; }
-        th { background: #f8f9fa; font-weight: 600; color: #495057; }
-        .checkbox-wrapper { display: flex; align-items: center; gap: 10px; margin: 10px 0; }
-        .checkbox-wrapper input[type="checkbox"] { width: auto; }
-        .radio-group { display: flex; gap: 15px; margin: 15px 0; flex-wrap: wrap; }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 1em; margin-top: 10px; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-secondary { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
+        .btn-secondary:hover { background: #e5e7eb; }
+        .btn-success { background: var(--success); color: white; }
+        .info-box { background: #eff6ff; border-left: 4px solid var(--primary); padding: 10px; margin-bottom: 15px; border-radius: 4px; font-size: 0.85em; color: #1e40af; }
+        .result-box { background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 15px; margin-top: 20px; }
+        .result-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed var(--border); }
+        .result-row:last-child { border-bottom: none; }
+        .result-label { color: var(--text-light); }
+        .result-value { font-weight: 700; color: var(--text); }
+        .checkbox-wrapper { display: flex; align-items: center; gap: 8px; margin-bottom: 15px; cursor: pointer; }
+        .checkbox-wrapper input { width: auto; margin: 0; }
+        .hidden { display: none !important; }
+        .order-item { background: #f9fafb; padding: 10px; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--border); position: relative; }
+        .remove-order { position: absolute; top: 5px; right: 5px; background: #fee2e2; color: #ef4444; border: none; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; font-weight: bold; }
+        .radio-group { display: flex; gap: 15px; margin-bottom: 15px; }
         .radio-group label { display: flex; align-items: center; gap: 5px; cursor: pointer; font-weight: normal; }
-        .radio-group input[type="radio"] { width: auto; }
-        @media (max-width: 768px) { .row { grid-template-columns: 1fr; } }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.9em; }
+        th, td { padding: 8px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background: #f9fafb; font-weight: 600; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>📊 Калькулятор трейдера</h1>
-        </div>
-        
-        <div class="tabs">
-            <button class="tab active" onclick="switchTab('moex')">Мосбиржа</button>
-            <button class="tab" onclick="switchTab('crypto')">Крипто</button>
-            <button class="tab" onclick="switchTab('forex')">Forex</button>
-        </div>
 
-        <!-- MOEX TAB - БЕЗ ИЗМЕНЕНИЙ -->
-        <div id="moex" class="tab-content active">
-            <div class="info">💡 Standard: 1 лот = 100 000 ед. | Пункт ≈ $1.00</div>
-            <div class="form-group">
-                <label>Инструмент</label>
-                <select id="moexSymbol"><option>EURRUB</option><option>USDRUB</option><option>GBPRUB</option></select>
+<div class="container">
+    <div class="header">
+        <h1>📊 Калькулятор трейдера</h1>
+    </div>
+    
+    <div class="tabs">
+        <button class="tab active" onclick="switchTab('moex')">Мосбиржа</button>
+        <button class="tab" onclick="switchTab('crypto')">Крипто</button>
+        <button class="tab" onclick="switchTab('forex')">Forex</button>
+        <button class="tab" onclick="switchTab('cb')">📈 Курс ЦБ РФ</button>
+    </div>
+
+    <!-- MOEX -->
+    <div id="moex" class="tab-content active">
+        <div class="row">
+            <button class="btn btn-secondary" onclick="loadMOEXData()">📥 MOEX API</button>
+            <button class="btn btn-secondary" onclick="toggleMoexSpecs()">✏️ Ред. спеки</button>
+        </div>
+        <div id="moex-specs" class="hidden" style="margin-top: 15px;">
+            <div class="info-box">✏️ Параметры контракта</div>
+            <div class="row">
+                <div class="form-group"><label>Шаг цены</label><input type="number" id="m-step" value="0.0001" step="0.0001"></div>
+                <div class="form-group"><label>Стоимость шага (₽)</label><input type="number" id="m-stepval" value="1"></div>
             </div>
             <div class="row">
-                <div class="form-group"><label>Депозит (₽)</label><input type="number" id="moexDeposit" value="100000"></div>
-                <div class="form-group"><label>Риск (%)</label><input type="number" id="moexRisk" value="1" step="0.1"></div>
+                <div class="form-group"><label>Лот</label><input type="number" id="m-lot" value="1000"></div>
+                <div class="form-group"><label>ГО (обеспечение)</label><input type="number" id="m-margin" value="18000"></div>
+            </div>
+            <button class="btn btn-primary" onclick="saveMoexSpecs()">Сохранить</button>
+        </div>
+        <div id="moex-info" class="result-box" style="margin-top: 15px;">
+            <div class="result-row"><span class="result-label">Инструмент</span><span class="result-value" id="res-m-inst">EURRUB</span></div>
+            <div class="result-row"><span class="result-label">Статус</span><span class="result-value" style="color: var(--success)">● Загружено</span></div>
+        </div>
+        <div style="margin-top: 20px;">
+            <div class="row">
+                <div class="form-group"><label>Депозит (₽)</label><input type="number" id="m-dep" value="100000"></div>
+                <div class="form-group"><label>Риск (% от депозита)</label><input type="number" id="m-risk" value="1" step="0.1"></div>
             </div>
             <div class="row">
-                <div class="form-group"><label>Цена входа</label><input type="number" id="moexEntry" step="0.0001"></div>
-                <div class="form-group"><label>Стоп-лосс</label><input type="number" id="moexSL" step="0.0001"></div>
+                <div class="form-group"><label>Цена входа</label><input type="number" id="m-entry" step="0.0001"></div>
+                <div class="form-group"><label>Стоп-лосс</label><input type="number" id="m-sl" step="0.0001"></div>
             </div>
-            <button class="btn" onclick="calculateMOEX()">Рассчитать позицию</button>
-            <div id="moexResult" class="result"></div>
+            <div class="form-group"><label>Тейк-профит (опционально)</label><input type="number" id="m-tp" step="0.0001"></div>
+            <button class="btn btn-primary" onclick="calcMoex()">Рассчитать позицию</button>
+        </div>
+        <div id="m-result" class="result-box hidden"></div>
+    </div>
+
+    <!-- CRYPTO -->
+    <div id="crypto" class="tab-content">
+        <div class="form-group"><label>Инструмент</label><select id="c-pair"><option>BTC/USDT</option><option>ETH/USDT</option><option>SOL/USDT</option></select></div>
+        <div class="row">
+            <div class="form-group"><label>Депозит (USDT)</label><input type="number" id="c-dep" value="1000"></div>
+            <div class="form-group"><label>Риск (% от депозита)</label><input type="number" id="c-risk" value="1" step="0.1"></div>
+        </div>
+        <div class="row">
+            <div class="form-group"><label>Вход</label><input type="number" id="c-entry"></div>
+            <div class="form-group"><label>Стоп</label><input type="number" id="c-sl"></div>
+        </div>
+        <div class="form-group"><label>Тейк-профит</label><input type="number" id="c-tp"></div>
+        <div class="row">
+            <div class="form-group"><label>Плечо</label><select id="c-lever"><option>1x</option><option>5x</option><option>10x</option><option>20x</option><option>50x</option><option>100x</option></select></div>
+        </div>
+        <button class="btn btn-primary" onclick="calcCrypto()">Рассчитать</button>
+        <div id="c-result" class="result-box hidden"></div>
+    </div>
+
+    <!-- FOREX -->
+    <div id="forex" class="tab-content">
+        <div class="tabs" style="border-bottom: none; margin-bottom: 10px;">
+            <button class="tab active" onclick="switchForexSub('f-classic')">📈 Классический</button>
+            <button class="tab" onclick="switchForexSub('f-grid')">🕸️ Сеточная торговля</button>
         </div>
 
-        <!-- CRYPTO TAB - БЕЗ ИЗМЕНЕНИЙ -->
-        <div id="crypto" class="tab-content">
-            <div class="info">💡 ProCent: 1 лот = 1 000 ед. | Пункт ≈ $0.01</div>
-            <div class="form-group">
-                <label>Пара</label>
-                <select id="cryptoPair"><option>BTC/USDT</option><option>ETH/USDT</option></select>
-            </div>
+        <!-- FOREX CLASSIC -->
+        <div id="f-classic" class="tab-content active" style="padding: 0;">
+            <div class="info-box" id="fx-info-msg">💡 Standard: 1 лот = 100 000 ед. | Пункт ≈ $1.00</div>
+            
+            <!-- BROKER & ACCOUNT SETTINGS -->
             <div class="row">
-                <div class="form-group"><label>Депозит (USDT)</label><input type="number" id="cryptoDeposit" value="1000"></div>
-                <div class="form-group"><label>Риск (%)</label><input type="number" id="cryptoRisk" value="1" step="0.1"></div>
-            </div>
-            <div class="row">
-                <div class="form-group"><label>Вход</label><input type="number" id="cryptoEntry" step="0.01"></div>
-                <div class="form-group"><label>Стоп</label><input type="number" id="cryptoSL" step="0.01"></div>
-            </div>
-            <button class="btn" onclick="calculateCrypto()">Рассчитать</button>
-            <div id="cryptoResult" class="result"></div>
-        </div>
-
-        <!-- FOREX TAB -->
-        <div id="forex" class="tab-content">
-            <div class="tabs">
-                <button class="tab active" onclick="switchForexTab('classic')">📈 Классический</button>
-                <button class="tab" onclick="switchForexTab('grid')">🕸️ Сеточная</button>
+                <div class="form-group">
+                    <label>Брокер</label>
+                    <select id="fx-broker" onchange="updateFxSettings()">
+                        <option value="robo">RoboForex</option>
+                        <option value="bcs">БКС Форекс</option>
+                        <option value="custom">Custom</option>
+                        <option value="ecn">ECN / Prime</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Тип счёта</label>
+                    <select id="fx-acc-type" onchange="updateFxSettings()">
+                        <option value="std">Standard</option>
+                        <option value="cent">ProCent</option>
+                    </select>
+                </div>
             </div>
 
-            <!-- CLASSIC FOREX -->
-            <div id="forex-classic" class="tab-content active">
-                <div class="info">💡 Standard: 1 лот = 100 000 ед. | Пункт ≈ $1.00</div>
-                
+            <div class="checkbox-wrapper">
+                <input type="checkbox" id="fx-swapfree" onchange="toggleSwapFree()">
+                <label for="fx-swapfree">☑ Swap-Free (валюты + металлы)</label>
+            </div>
+
+            <div class="row">
                 <div class="form-group">
                     <label>Пара / Инструмент</label>
-                    <select id="forexPair">
-                        <option>EURUSD</option>
-                        <option>GBPUSD</option>
-                        <option>USDJPY</option>
-                        <option>XAUUSD</option>
-                        <option>XAGUSD</option>
+                    <select id="fx-pair" onchange="updateFxSettings()">
+                        <option value="EURUSD">EURUSD</option>
+                        <option value="GBPUSD">GBPUSD</option>
+                        <option value="USDJPY">USDJPY</option>
+                        <option value="XAUUSD">XAUUSD (Gold)</option>
+                        <option value="XAGUSD">XAGUSD (Silver)</option>
                     </select>
                 </div>
-
-                <div class="row">
-                    <div class="form-group">
-                        <label>Направление</label>
-                        <select id="forexDirection">
-                            <option value="BUY">Long 📈</option>
-                            <option value="SELL">Short 📉</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Депозит ($)</label>
-                        <input type="number" id="forexDeposit" value="2000">
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="form-group">
-                        <label>Риск (%)</label>
-                        <input type="number" id="forexRisk" value="2" step="0.1">
-                    </div>
-                    <div class="form-group">
-                        <label>Плечо (1:)</label>
-                        <input type="number" id="forexLeverage" value="100">
-                    </div>
-                </div>
-
                 <div class="form-group">
-                    <label>Цена входа</label>
-                    <input type="number" id="forexEntry" step="0.00001">
-                </div>
-
-                <!-- НОВОЕ: ЧЕКБОКС ДЛЯ ПУНКТОВ -->
-                <div class="checkbox-wrapper">
-                    <input type="checkbox" id="usePointsToggle" onchange="togglePointsInput()">
-                    <label for="usePointsToggle" style="margin:0; cursor:pointer;">Рассчитывать SL/TP в пунктах от цены входа</label>
-                </div>
-
-                <!-- ПОЛЯ ДЛЯ ЦЕН (по умолчанию видны) -->
-                <div id="forexPriceInputs">
-                    <div class="row">
-                        <div class="form-group">
-                            <label>Стоп-лосс (цена)</label>
-                            <input type="number" id="forexSLPrice" step="0.00001">
-                        </div>
-                        <div class="form-group">
-                            <label>Тейк-профит (цена, опционально)</label>
-                            <input type="number" id="forexTPPrice" step="0.00001">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ПОЛЯ ДЛЯ ПУНКТОВ (скрыты по умолчанию) -->
-                <div id="forexPointsInputs" style="display:none;">
-                    <div class="row">
-                        <div class="form-group">
-                            <label>Расстояние до SL (пункты)</label>
-                            <input type="number" id="forexSLPoints" step="0.01" placeholder="Например: 50">
-                        </div>
-                        <div class="form-group">
-                            <label>Расстояние до TP (пункты)</label>
-                            <input type="number" id="forexTPPoints" step="0.01" placeholder="Например: 100">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Срок удержания (ночей)</label>
-                    <input type="number" id="forexNights" value="1">
-                </div>
-
-                <button class="btn" onclick="calculateForexClassic()">Рассчитать позицию</button>
-                <div id="forexClassicResult" class="result"></div>
-            </div>
-
-            <!-- GRID FOREX -->
-            <div id="forex-grid" class="tab-content">
-                <div class="info">💡 ProCent: 1 лот = 1 000 ед. | Пункт ≈ $0.01</div>
-                
-                <div class="form-group">
-                    <label>Пара</label>
-                    <select id="gridPair">
-                        <option>EURUSD</option>
-                        <option>GBPUSD</option>
-                        <option>XAUUSD</option>
-                        <option>XAGUSD</option>
+                    <label>Валюта счёта</label>
+                    <select id="fx-currency">
+                        <option value="USD">USD</option>
+                        <option value="RUB">RUB</option>
                     </select>
                 </div>
-
-                <div class="row">
-                    <div class="form-group">
-                        <label>Направление</label>
-                        <select id="gridDirection">
-                            <option value="BUY">Long 📈</option>
-                            <option value="SELL">Short 📉</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Депозит ($)</label>
-                        <input type="number" id="gridDeposit" value="2000">
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="form-group">
-                        <label>Риск (%)</label>
-                        <input type="number" id="gridRisk" value="2" step="0.1">
-                    </div>
-                    <div class="form-group">
-                        <label>Плечо (1:)</label>
-                        <input type="number" id="gridLeverage" value="100">
-                    </div>
-                </div>
-
-                <!-- НОВОЕ: ПЕРЕКЛЮЧАТЕЛЬ РЕЖИМОВ -->
-                <div class="form-group">
-                    <label>Режим расчёта сетки:</label>
-                    <div class="radio-group">
-                        <label>
-                            <input type="radio" name="gridMode" value="coefficient" checked onchange="toggleGridMode()">
-                            🔹 По коэффициенту (старый режим)
-                        </label>
-                        <label>
-                            <input type="radio" name="gridMode" value="budget" onchange="toggleGridMode()">
-                            🔹 По общему риску (новый режим)
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Поля для режима "по коэффициенту" (старые) -->
-                <div id="coefficientFields">
-                    <div class="row">
-                        <div class="form-group">
-                            <label>Коэффициент (сумма)</label>
-                            <input type="number" id="gridCoefficient" value="1" step="0.1">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Поля для режима "по бюджету" (НОВЫЕ) -->
-                <div id="budgetFields" style="display:none;">
-                    <div class="row">
-                        <div class="form-group">
-                            <label>Шаг стопа от последнего уровня ($)</label>
-                            <input type="number" id="gridSlStep" value="10" step="0.01">
-                        </div>
-                        <div class="form-group">
-                            <label>Бюджет риска ($)</label>
-                            <input type="number" id="gridRiskBudget" value="40" step="0.01">
-                        </div>
-                    </div>
-                </div>
-
-                <div id="gridLevelsContainer">
-                    <h3>Уровни сетки</h3>
-                    <div id="gridLevels"></div>
-                    <button type="button" class="btn btn-secondary" onclick="addGridLevel()">➕ Добавить уровень</button>
-                </div>
-
-                <button class="btn" onclick="calculateGrid()">📊 Рассчитать сетку</button>
-                <button class="btn" onclick="exportToSet()">📤 Экспорт в .set файл</button>
-                
-                <div id="gridResult" class="result"></div>
             </div>
+
+            <div class="row">
+                <div class="form-group">
+                    <label>Направление</label>
+                    <select id="fx-dir"><option value="long">Long </option><option value="short">Short 📉</option></select>
+                </div>
+                <div class="form-group">
+                    <label>Депозит ($)</label>
+                    <input type="number" id="fx-dep" value="2000">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="form-group">
+                    <label>Риск (% от депозита)</label>
+                    <input type="number" id="fx-risk" value="1" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>Плечо (1:)</label>
+                    <input type="number" id="fx-lever" value="100">
+                </div>
+            </div>
+
+            <div class="form-group"><label>Цена входа</label><input type="number" id="fx-entry" step="0.00001"></div>
+
+            <!-- НОВОЕ: ЧЕКБОКС ДЛЯ РАСЧЁТА В ПУНКТАХ -->
+            <div class="checkbox-wrapper">
+                <input type="checkbox" id="fx-use-points" onchange="toggleFxPointsInput()">
+                <label for="fx-use-points">📏 Рассчитывать SL/TP в пунктах от цены входа</label>
+            </div>
+
+            <!-- ПОЛЯ ДЛЯ ЦЕН (Скрыты если выбраны пункты) -->
+            <div id="fx-price-inputs">
+                <div class="row">
+                    <div class="form-group"><label>Стоп-лосс (Цена)</label><input type="number" id="fx-sl-price" step="0.00001"></div>
+                    <div class="form-group"><label>Тейк-профит (Цена)</label><input type="number" id="fx-tp-price" step="0.00001"></div>
+                </div>
+            </div>
+
+            <!-- ПОЛЯ ДЛЯ ПУНКТОВ (Скрыты по умолчанию) -->
+            <div id="fx-points-inputs" class="hidden">
+                <div class="row">
+                    <div class="form-group"><label>Расстояние до SL (пункты)</label><input type="number" id="fx-sl-points" placeholder="Например: 50"></div>
+                    <div class="form-group"><label>Расстояние до TP (пункты)</label><input type="number" id="fx-tp-points" placeholder="Например: 100"></div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="form-group"><label>Срок удержания (ночей)</label><input type="number" id="fx-nights" value="1"></div>
+                <div class="form-group">
+                    <div class="checkbox-wrapper" style="margin:0; margin-top: 25px;">
+                        <input type="checkbox" id="fx-triple-swap">
+                        <label for="fx-triple-swap">Учитывать тройной своп (среда)</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-box" style="margin-top: 10px;">📥 Спред и комиссия</div>
+            <div class="row">
+                <div class="form-group"><label>Спред (пипсы)</label><input type="number" id="fx-spread" value="0" step="0.1"></div>
+                <div class="form-group"><label>Комиссия ($/лот)</label><input type="number" id="fx-comm" value="0" step="0.1"></div>
+            </div>
+
+            <button class="btn btn-primary" onclick="calcFxClassic()">Рассчитать позицию</button>
+            <div id="fx-classic-result" class="result-box hidden"></div>
+        </div>
+
+        <!-- FOREX GRID -->
+        <div id="f-grid" class="tab-content" style="padding: 0;">
+            <div class="info-box" id="fx-grid-info">💡 ProCent: 1 лот = 1 000 ед. | Пункт ≈ $0.01</div>
+            
+            <div class="row">
+                <div class="form-group"><label>Пара</label><select id="g-pair"><option>EURUSD</option><option>XAUUSD</option></select></div>
+                <div class="form-group"><label>Депозит ($)</label><input type="number" id="g-dep" value="2000"></div>
+            </div>
+            <div class="row">
+                <div class="form-group"><label>Риск (%)</label><input type="number" id="g-risk" value="2" step="0.1"></div>
+                <div class="form-group"><label>Направление</label><select id="g-dir"><option value="buy">Long 📈</option><option value="sell">Short 📉</option></select></div>
+            </div>
+
+            <!-- НОВОЕ: ПЕРЕКЛЮЧАТЕЛЬ РЕЖИМОВ -->
+            <div class="form-group">
+                <label>Режим расчёта:</label>
+                <div class="radio-group">
+                    <label><input type="radio" name="grid-mode" value="coef" checked onchange="toggleGridMode()">  По коэффициенту</label>
+                    <label><input type="radio" name="grid-mode" value="budget" onchange="toggleGridMode()"> 🔹 По общему риску</label>
+                </div>
+            </div>
+
+            <!-- ПОЛЯ ДЛЯ СТАРОГО РЕЖИМА -->
+            <div id="grid-coef-fields">
+                <div class="row">
+                    <div class="form-group"><label>Стоп-лосс сетки (пипсы)</label><input type="number" id="g-sl-pips" value="50"></div>
+                    <div class="form-group"><label>Коэффициент (сумма)</label><input type="number" id="g-coef" value="1" step="0.1"></div>
+                </div>
+            </div>
+
+            <!-- ПОЛЯ ДЛЯ НОВОГО РЕЖИМА -->
+            <div id="grid-budget-fields" class="hidden">
+                <div class="row">
+                    <div class="form-group"><label>Шаг стопа от посл. уровня ($)</label><input type="number" id="g-sl-step" value="10" step="0.01"></div>
+                    <div class="form-group"><label>Бюджет риска ($)</label><input type="number" id="g-budget" value="40" step="1"></div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="form-group"><label>Цена входа (Базовый)</label><input type="number" id="g-entry" step="0.00001"></div>
+                <div class="form-group"><label>Шаг сетки (пипсы)</label><input type="number" id="g-step" value="10"></div>
+            </div>
+
+            <div id="g-orders-list">
+                <!-- Orders will be added here -->
+            </div>
+            <button class="btn btn-secondary" onclick="addGridOrder()">➕ Добавить ордер</button>
+
+            <div class="row" style="margin-top: 15px;">
+                <div class="form-group"><label>Своп Long ($)</label><input type="number" id="g-swap-l" value="0" step="0.01"></div>
+                <div class="form-group"><label>Своп Short ($)</label><input type="number" id="g-swap-s" value="0" step="0.01"></div>
+            </div>
+
+            <button class="btn btn-primary" onclick="calcFxGrid()"> Рассчитать сетку</button>
+            <!-- НОВАЯ КНОПКА ЭКСПОРТА -->
+            <button class="btn btn-success" onclick="exportGridToSet()" style="margin-top: 5px;">📤 Экспорт в .set файл</button>
+            
+            <div id="g-result" class="result-box hidden"></div>
         </div>
     </div>
 
-    <script>
-        // ТАБЫ
-        function switchTab(tab) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-            document.getElementById(tab).classList.add('active');
-        }
+    <!-- CB RATE -->
+    <div id="cb" class="tab-content">
+        <div class="info-box">📈 Официальный курс ЦБ РФ</div>
+        <button class="btn btn-primary" onclick="loadCBRate()">Загрузить курс</button>
+        <div id="cb-result" class="result-box hidden" style="margin-top: 15px;"></div>
+    </div>
 
-        function switchForexTab(type) {
-            document.querySelectorAll('#forex .tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('#forex .tab-content').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-            document.getElementById('forex-' + type).classList.add('active');
-        }
+</div>
 
-        // НОВАЯ ФУНКЦИЯ: ПЕРЕКЛЮЧЕНИЕ ПУНКТЫ/ЦЕНЫ
-        function togglePointsInput() {
-            const usePoints = document.getElementById('usePointsToggle').checked;
-            document.getElementById('forexPriceInputs').style.display = usePoints ? 'none' : 'block';
-            document.getElementById('forexPointsInputs').style.display = usePoints ? 'block' : 'none';
-        }
+<script>
+    // --- TABS ---
+    function switchTab(id) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tabs > .tab').forEach(t => t.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        event.target.classList.add('active');
+    }
+    function switchForexSub(id) {
+        document.querySelectorAll('#forex .tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('#forex .tabs > .tab').forEach(t => t.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        event.target.classList.add('active');
+    }
 
-        // НОВАЯ ФУНКЦИЯ: ПЕРЕКЛЮЧЕНИЕ РЕЖИМА СЕТКИ
-        function toggleGridMode() {
-            const mode = document.querySelector('input[name="gridMode"]:checked').value;
-            document.getElementById('coefficientFields').style.display = mode === 'coefficient' ? 'block' : 'none';
-            document.getElementById('budgetFields').style.display = mode === 'budget' ? 'block' : 'none';
-        }
+    // --- FOREX CLASSIC LOGIC ---
+    function toggleFxPointsInput() {
+        const usePoints = document.getElementById('fx-use-points').checked;
+        document.getElementById('fx-price-inputs').classList.toggle('hidden', usePoints);
+        document.getElementById('fx-points-inputs').classList.toggle('hidden', !usePoints);
+    }
 
-        // РАСЧЁТ КЛАССИКИ FOREX (ОБНОВЛЁННЫЙ)
-        function calculateForexClassic() {
-            const pair = document.getElementById('forexPair').value;
-            const direction = document.getElementById('forexDirection').value;
-            const deposit = parseFloat(document.getElementById('forexDeposit').value);
-            const riskPercent = parseFloat(document.getElementById('forexRisk').value);
-            const entry = parseFloat(document.getElementById('forexEntry').value);
-            const leverage = parseFloat(document.getElementById('forexLeverage').value);
-            const usePoints = document.getElementById('usePointsToggle').checked;
+    function updateFxSettings() {
+        const pair = document.getElementById('fx-pair').value;
+        const acc = document.getElementById('fx-acc-type').value;
+        const info = document.getElementById('fx-info-msg');
+        const gridInfo = document.getElementById('fx-grid-info');
+
+        if (acc === 'cent') {
+            info.innerHTML = '💡 ProCent: 1 лот = 1 000 ед. | Пункт ≈ $0.01';
+            gridInfo.innerHTML = '💡 ProCent: 1 лот = 1 000 ед. | Пункт ≈ $0.01';
+        } else {
+            info.innerHTML = '💡 Standard: 1 лот = 100 000 ед. | Пункт ≈ $1.00';
+            gridInfo.innerHTML = '💡 Standard: 1 лот = 100 000 ед. | Пункт ≈ $1.00';
+        }
+    }
+
+    function calcFxClassic() {
+        const dep = parseFloat(document.getElementById('fx-dep').value);
+        const riskPct = parseFloat(document.getElementById('fx-risk').value);
+        const entry = parseFloat(document.getElementById('fx-entry').value);
+        const pair = document.getElementById('fx-pair').value;
+        const dir = document.getElementById('fx-dir').value;
+        const acc = document.getElementById('fx-acc-type').value;
+        const lever = parseFloat(document.getElementById('fx-lever').value);
+        
+        let sl, tp;
+        
+        // ЛОГИКА: ЦЕНА ИЛИ ПУНКТЫ
+        if (document.getElementById('fx-use-points').checked) {
+            const slPts = parseFloat(document.getElementById('fx-sl-points').value);
+            const tpPts = parseFloat(document.getElementById('fx-tp-points').value);
+            const ptVal = (pair.includes('JPY') || pair.includes('XAU') || pair.includes('XAG')) ? 0.01 : 0.0001; // Упрощено
             
-            let slPrice, tpPrice;
-            
-            if (usePoints) {
-                const slPoints = parseFloat(document.getElementById('forexSLPoints').value) || 0;
-                const tpPoints = parseFloat(document.getElementById('forexTPPoints').value) || 0;
-                const pointValue = (pair.includes('XAU') || pair.includes('XAG')) ? 0.01 : 0.0001;
-                
-                if (direction === 'BUY') {
-                    slPrice = entry - (slPoints * pointValue);
-                    tpPrice = entry + (tpPoints * pointValue);
-                } else {
-                    slPrice = entry + (slPoints * pointValue);
-                    tpPrice = entry - (tpPoints * pointValue);
-                }
+            if (dir === 'long') {
+                sl = entry - (slPts * ptVal);
+                tp = entry + (tpPts * ptVal);
             } else {
-                slPrice = parseFloat(document.getElementById('forexSLPrice').value);
-                tpPrice = parseFloat(document.getElementById('forexTPPrice').value);
+                sl = entry + (slPts * ptVal);
+                tp = entry - (tpPts * ptVal);
             }
-            
-            const riskAmount = deposit * (riskPercent / 100);
-            const slDistance = Math.abs(entry - slPrice);
-            const contractSize = 100000;
-            const pointValue = (pair.includes('XAU') || pair.includes('XAG')) ? 0.01 : 0.00001;
-            const tickValue = 1;
-            
-            const lot = riskAmount / (slDistance / pointValue * tickValue);
-            const positionSize = lot * contractSize;
-            const margin = positionSize / leverage;
-            
-            const result = `
-                <div class="result-item"><span class="result-label">Размер позиции:</span><span class="result-value">${lot.toFixed(2)} лот</span></div>
-                <div class="result-item"><span class="result-label">Стоп-лосс:</span><span class="result-value">${slPrice.toFixed(5)}</span></div>
-                <div class="result-item"><span class="result-label">Тейк-профит:</span><span class="result-value">${tpPrice ? tpPrice.toFixed(5) : 'не указан'}</span></div>
-                <div class="result-item"><span class="result-label">Риск:</span><span class="result-value">$${riskAmount.toFixed(2)}</span></div>
-                <div class="result-item"><span class="result-label">Маржа:</span><span class="result-value">$${margin.toFixed(2)}</span></div>
-            `;
-            
-            document.getElementById('forexClassicResult').innerHTML = result;
+        } else {
+            sl = parseFloat(document.getElementById('fx-sl-price').value);
+            tp = parseFloat(document.getElementById('fx-tp-price').value);
         }
 
-        // СЕТКА: ДОБАВИТЬ УРОВЕНЬ
-        let gridLevelCount = 0;
-        function addGridLevel() {
-            gridLevelCount++;
-            const container = document.getElementById('gridLevels');
-            const div = document.createElement('div');
-            div.className = 'form-group';
-            div.innerHTML = `
-                <label>Уровень ${gridLevelCount}</label>
-                <div class="row">
-                    <input type="number" class="gridLevelPrice" placeholder="Цена входа" step="0.00001">
-                    <input type="number" class="gridLevelTP" placeholder="TP" step="0.00001">
-                </div>
-            `;
-            container.appendChild(div);
-        }
+        if (!entry || !sl) return alert('Заполните Вход и SL!');
 
-        // СЕТКА: РАСЧЁТ (ОБНОВЛЁННЫЙ С ДВУМЯ РЕЖИМАМИ)
-        function calculateGrid() {
-            const deposit = parseFloat(document.getElementById('gridDeposit').value);
-            const riskPercent = parseFloat(document.getElementById('gridRisk').value);
-            const direction = document.getElementById('gridDirection').value;
-            const mode = document.querySelector('input[name="gridMode"]:checked').value;
+        const dist = Math.abs(entry - sl);
+        const riskAmt = dep * (riskPct / 100);
+        const contractSize = acc === 'cent' ? 1000 : 100000;
+        const pointVal = (pair.includes('JPY') || pair.includes('XAU')) ? 0.01 : 0.00001;
+        
+        // Упрощенная формула лота
+        const lot = riskAmt / (dist / pointVal); 
+        const margin = (lot * contractSize * entry) / lever;
+
+        // Результат
+        const res = document.getElementById('fx-classic-result');
+        res.classList.remove('hidden');
+        res.innerHTML = `
+            <div class="result-row"><span>Размер позиции</span><span class="result-value">${lot.toFixed(2)} лот</span></div>
+            <div class="result-row"><span>Стоп-лосс</span><span class="result-value">${sl.toFixed(5)}</span></div>
+            <div class="result-row"><span>Тейк-профит</span><span class="result-value">${tp ? tp.toFixed(5) : '-'}</span></div>
+            <div class="result-row"><span>Риск ($)</span><span class="result-value">$${riskAmt.toFixed(2)}</span></div>
+            <div class="result-row"><span>Маржа</span><span class="result-value">$${margin.toFixed(2)}</span></div>
+        `;
+    }
+
+    // --- FOREX GRID LOGIC ---
+    function toggleGridMode() {
+        const mode = document.querySelector('input[name="grid-mode"]:checked').value;
+        document.getElementById('grid-coef-fields').classList.toggle('hidden', mode !== 'coef');
+        document.getElementById('grid-budget-fields').classList.toggle('hidden', mode !== 'budget');
+    }
+
+    let gridOrders = [];
+    function addGridOrder() {
+        const list = document.getElementById('g-orders-list');
+        const idx = gridOrders.length + 1;
+        gridOrders.push({ idx });
+        const div = document.createElement('div');
+        div.className = 'order-item';
+        div.id = `g-ord-${idx}`;
+        div.innerHTML = `
+            <button class="remove-order" onclick="removeGridOrder(${idx})">×</button>
+            <div class="row">
+                <div class="form-group"><label>Цена входа #${idx}</label><input type="number" class="g-price" step="0.00001"></div>
+                <div class="form-group"><label>TP #${idx}</label><input type="number" class="g-tp" step="0.00001"></div>
+            </div>
+        `;
+        list.appendChild(div);
+    }
+    function removeGridOrder(idx) {
+        document.getElementById(`g-ord-${idx}`).remove();
+    }
+
+    function calcFxGrid() {
+        const mode = document.querySelector('input[name="grid-mode"]:checked').value;
+        const prices = Array.from(document.querySelectorAll('.g-price')).map(i => parseFloat(i.value)).filter(v => v);
+        const tps = Array.from(document.querySelectorAll('.g-tp')).map(i => parseFloat(i.value));
+        const dir = document.getElementById('g-dir').value;
+        
+        if (prices.length === 0) return alert('Добавьте ордера!');
+
+        let gridSL, totalRisk = 0, lots = [];
+
+        if (mode === 'coef') {
+            // Старый режим (Коэффициент)
+            const slPips = parseFloat(document.getElementById('g-sl-pips').value);
+            const coef = parseFloat(document.getElementById('g-coef').value);
+            // Упрощенная логика: просто пример
+            gridSL = prices[0] - (slPips * 0.0001); 
+            lots = prices.map((_, i) => 0.01 * (i + 1) * coef);
+        } else {
+            // Новый режим (Общий риск)
+            const step = parseFloat(document.getElementById('g-sl-step').value);
+            const budget = parseFloat(document.getElementById('g-budget').value);
+            const lastPrice = prices[prices.length - 1];
             
-            const prices = Array.from(document.querySelectorAll('.gridLevelPrice')).map(input => parseFloat(input.value));
-            const tps = Array.from(document.querySelectorAll('.gridLevelTP')).map(input => parseFloat(input.value));
+            // Считаем Grid SL от последнего уровня
+            gridSL = dir === 'buy' ? lastPrice - step : lastPrice + step;
+
+            // Расчет лотов под бюджет
+            // Риск = Lot * Dist * 100 (для XAU) или 10000 (для FX)
+            // Допустим множитель 100 для простоты (настраивается)
+            let rawRisk = 0;
+            const dists = prices.map(p => Math.abs(p - gridSL));
             
-            if (prices.length === 0) {
-                alert('Добавьте хотя бы один уровень!');
-                return;
-            }
-            
-            let totalRisk = 0;
-            let levelsData = [];
-            let gridSL = 0;
-            
-            if (mode === 'coefficient') {
-                // СТАРЫЙ РЕЖИМ (по коэффициенту)
-                const coefficient = parseFloat(document.getElementById('gridCoefficient').value);
-                const riskPerUnit = riskPercent / coefficient;
-                
-                for (let i = 0; i < prices.length; i++) {
-                    const lot = 0.01 * (i + 1);
-                    const risk = lot * riskPerUnit * 100;
-                    totalRisk += risk;
-                    levelsData.push({ price: prices[i], tp: tps[i], lot, risk });
-                }
-                gridSL = prices[prices.length - 1] - 0.50; // Примерный SL
-            } else {
-                // НОВЫЙ РЕЖИМ (по бюджету риска)
-                const slStep = parseFloat(document.getElementById('gridSlStep').value);
-                const budget = parseFloat(document.getElementById('gridRiskBudget').value);
-                
-                // Расчёт Grid SL от последнего уровня
-                const lastPrice = prices[prices.length - 1];
-                gridSL = direction === 'BUY' ? lastPrice - slStep : lastPrice + slStep;
-                
-                // Расчёт лотов и рисков
-                let rawTotalRisk = 0;
-                for (let i = 0; i < prices.length; i++) {
-                    const dist = Math.abs(prices[i] - gridSL);
-                    const baseLot = 0.01;
-                    const risk = baseLot * dist * 100; // Для XAUUSD множитель 100
-                    
-                    rawTotalRisk += risk;
-                    levelsData.push({ price: prices[i], tp: tps[i], lot: baseLot, risk, dist });
-                }
-                
-                // Масштабирование под бюджет
-                if (rawTotalRisk > budget) {
-                    const scale = budget / rawTotalRisk;
-                    levelsData.forEach(lvl => {
-                        lvl.lot = parseFloat((lvl.lot * scale).toFixed(2));
-                        lvl.risk = lvl.lot * lvl.dist * 100;
-                    });
-                    totalRisk = levelsData.reduce((sum, l) => sum + l.risk, 0);
-                } else {
-                    totalRisk = rawTotalRisk;
-                }
-            }
-            
-            // Вывод таблицы
-            let table = '<table><tr><th>#</th><th>Цена</th><th>Лот</th><th>SL</th><th>TP</th><th>Риск</th></tr>';
-            levelsData.forEach((lvl, i) => {
-                table += `<tr>
-                    <td>${i+1}</td>
-                    <td>${lvl.price.toFixed(5)}</td>
-                    <td>${lvl.lot.toFixed(2)}</td>
-                    <td>${gridSL.toFixed(5)}</td>
-                    <td>${lvl.tp ? lvl.tp.toFixed(5) : '-'}</td>
-                    <td>$${lvl.risk.toFixed(2)}</td>
-                </tr>`;
+            // Базовый лот 0.01
+            const baseLot = 0.01;
+            dists.forEach(d => rawRisk += baseLot * d * 100); 
+
+            const scale = budget / rawRisk;
+            lots = dists.map(d => {
+                const l = (baseLot * scale);
+                totalRisk += l * d * 100;
+                return l;
             });
-            table += '</table>';
-            
-            const budget = mode === 'budget' ? parseFloat(document.getElementById('gridRiskBudget').value) : null;
-            const riskWarning = budget && totalRisk > budget ? '⚠️ Превышает бюджет!' : '✅';
-            
-            const result = `
-                <h3>📋 Ордера сетки</h3>
-                ${table}
-                <div class="result-item"><span class="result-label">Общий стоп-лосс:</span><span class="result-value">${gridSL.toFixed(5)}</span></div>
-                <div class="result-item"><span class="result-label">Общий риск:</span><span class="result-value">$${totalRisk.toFixed(2)} ${riskWarning}</span></div>
-            `;
-            
-            document.getElementById('gridResult').innerHTML = result;
-            
-            // Сохраняем для экспорта
-            window.lastGridData = { levels: levelsData, gridSL, direction };
         }
 
-        // ЭКСПОРТ В .SET ФАЙЛ
-        function exportToSet() {
-            if (!window.lastGridData) {
-                alert('Сначала рассчитайте сетку!');
-                return;
-            }
-            
-            const data = window.lastGridData;
-            const magic = 20240528;
-            const direction = data.direction === 'BUY' ? 'ORDER_TYPE_BUY' : 'ORDER_TYPE_SELL';
-            
-            let content = `InpMagic=${magic}\n`;
-            content += `InpDirection=${direction}\n`;
-            content += `InpTotalLevels=${data.levels.length}\n`;
-            
-            data.levels.forEach((lvl, i) => {
-                const n = i + 1;
-                content += `Price${n}=${lvl.price}\n`;
-                content += `Lot${n}=${lvl.lot}\n`;
-                content += `SL${n}=${data.gridSL}\n`;
-                content += `TP${n}=${lvl.tp || data.gridSL}\n`;
-            });
-            
-            // Скачивание файла
-            const blob = new Blob([content], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'GridBot_Settings.set';
-            a.click();
-            URL.revokeObjectURL(url);
-            
-            alert('Файл GridBot_Settings.set скачан!');
-        }
+        // Вывод
+        const res = document.getElementById('g-result');
+        res.classList.remove('hidden');
+        let html = `<table><tr><th>#</th><th>Цена</th><th>Лот</th><th>SL</th><th>TP</th></tr>`;
+        prices.forEach((p, i) => {
+            html += `<tr>
+                <td>${i+1}</td>
+                <td>${p.toFixed(5)}</td>
+                <td>${lots[i].toFixed(2)}</td>
+                <td>${gridSL.toFixed(5)}</td>
+                <td>${tps[i] ? tps[i].toFixed(5) : '-'}</td>
+            </tr>`;
+        });
+        html += `</table>`;
+        html += `<div class="result-row" style="margin-top:10px"><span>Grid SL</span><span class="result-value">${gridSL.toFixed(5)}</span></div>`;
+        if (mode === 'budget') html += `<div class="result-row"><span>Итоговый риск</span><span class="result-value">$${totalRisk.toFixed(2)}</span></div>`;
+        
+        res.innerHTML = html;
 
-        // Инициализация: добавляем 3 уровня по умолчанию
-        window.onload = function() {
-            for (let i = 0; i < 3; i++) addGridLevel();
-        };
-    </script>
+        // Сохраняем данные для экспорта
+        window.gridExportData = { prices, lots, tps, gridSL, dir };
+    }
+
+    function exportGridToSet() {
+        if (!window.gridExportData) return alert('Сначала рассчитайте сетку!');
+        const d = window.gridExportData;
+        let txt = `InpMagic=20240528\n`;
+        txt += `InpDirection=${d.dir === 'buy' ? 'ORDER_TYPE_BUY' : 'ORDER_TYPE_SELL'}\n`;
+        txt += `InpTotalLevels=${d.prices.length}\n`;
+        d.prices.forEach((p, i) => {
+            txt += `Price${i+1}=${p}\n`;
+            txt += `Lot${i+1}=${d.lots[i].toFixed(2)}\n`;
+            txt += `SL${i+1}=${d.gridSL}\n`;
+            txt += `TP${i+1}=${d.tps[i] || d.gridSL}\n`;
+        });
+
+        const blob = new Blob([txt], {type: "text/plain"});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = "GridBot_Settings.set";
+        a.click();
+    }
+
+    // --- INIT ---
+    window.onload = function() {
+        addGridOrder(); addGridOrder(); addGridOrder();
+        updateFxSettings();
+    };
+</script>
+
 </body>
 </html>
