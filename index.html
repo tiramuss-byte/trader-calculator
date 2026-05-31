@@ -100,7 +100,7 @@
     <div id="panel-moex" class="panel">
       <div class="card">
         <div class="toolbar">
-          <button class="btn-outline" onclick="fetchCBR()">📈 Курс ЦБ РФ</button>
+          <button class="btn-outline" onclick="fetchCBR()"> Курс ЦБ РФ</button>
           <button class="btn-outline" onclick="fetchFromMoex()">📥 MOEX API</button>
           <button class="btn-outline" onclick="openEditor()">✏️ Ред. спеки</button>
         </div>
@@ -210,7 +210,7 @@
               <div><div class="fee-label">Спред (пипсы)</div><input type="number" id="fxSpread" step="0.1" value="0"></div>
               <div><div class="fee-label">Комиссия ($/лот)</div><input type="number" id="fxComm" step="0.1" value="0"></div>
               <div class="fee-actions">
-                <button class="btn-outline btn-xs" onclick="alert('Спеки подтягиваются автоматически')">📥</button>
+                <button class="btn-outline btn-xs" onclick="alert('Спеки подтягиваются автоматически')"></button>
                 <button class="btn-outline btn-xs" onclick="resetFxFees()">🔄</button>
               </div>
             </div>
@@ -234,7 +234,7 @@
           
           <!-- ПЕРЕКЛЮЧАТЕЛЬ РЕЖИМОВ -->
           <div class="radio-group" style="margin: 10px 0;">
-            <label><input type="radio" name="gridMode" value="coef" checked onchange="toggleGridMode()"> 🔹 По коэффициенту</label>
+            <label><input type="radio" name="gridMode" value="coef" checked onchange="toggleGridMode()">  По коэффициенту</label>
             <label><input type="radio" name="gridMode" value="budget" onchange="toggleGridMode()"> 🔹 По общему риску</label>
           </div>
           
@@ -284,7 +284,7 @@
           <label>Срок удержания (ночей)</label><input type="number" id="gridNights" value="1" min="0">
           
           <button class="btn" onclick="calcGrid()">📊 Рассчитать сетку</button>
-          <button class="btn btn-outline" onclick="exportGridToSet()" style="margin-top: 8px; border-color: var(--purple); color: var(--purple);"> Экспорт в .set файл</button>
+          <button class="btn btn-outline" onclick="exportGridToSet()" style="margin-top: 8px; border-color: var(--purple); color: var(--purple);">📤 Экспорт в .set файл</button>
         </div>
         <div class="card hidden" id="gridResults">
           <h3 style="margin:0 0 10px;font-size:1rem">📋 Ордера сетки</h3>
@@ -300,14 +300,14 @@
             <div class="spec-row"><span class="spec-label">Требуемая маржа:</span><span class="val" id="gridMargin">-</span></div>
             <div class="spec-row" id="gridSwapRowRes"><span class="spec-label">Своп (за период):</span><span class="val red" id="gridSwapTotal">-</span></div>
           </div>
-          <button class="copy-btn" onclick="copyGridLevels()"> Копировать уровни для терминала</button>
+          <button class="copy-btn" onclick="copyGridLevels()">📋 Копировать уровни для терминала</button>
         </div>
       </div>
     </div>
 
     <!-- Синхронизация настроек (внизу, не таб) -->
     <div class="card sync-card">
-      <h3 style="margin:0 0 8px; font-size:1rem;">💾 Синхронизация настроек</h3>
+      <h3 style="margin:0 0 8px; font-size:1rem;"> Синхронизация настроек</h3>
       <div class="toolbar">
         <button class="btn-outline" onclick="exportSettings()">💾 Скачать настройки</button>
         <button class="btn-outline" onclick="document.getElementById('fileInput').click()">📂 Загрузить настройки</button>
@@ -351,7 +351,7 @@
     const MOEX_GROUPS = {
       "💱 Валютные пары": { "Si-12.26": { step: 1, stepValue: 10, lot: 1000, go: 12500, currency: "RUB", status: "active", name: "USD/RUB", isUsd: true }, "ED-12.26": { step: 0.0001, stepValue: 10, lot: 1000, go: 24000, currency: "RUB", status: "active", name: "EUR/RUB", isUsd: false }, "CNY-12.26": { step: 0.0001, stepValue: 1, lot: 1000, go: 9000, currency: "RUB", status: "active", name: "CNY/RUB", isUsd: false }, "UJPY-12.26": { step: 0.01, stepValue: 1, lot: 10, go: 14000, currency: "RUB", status: "active", name: "RUB/JPY", isUsd: false } },
       "🛢️ Товарные фьючерсы": { "BR-12.26": { step: 0.01, stepValue: 100, lot: 100, go: 38000, currency: "RUB", status: "active", name: "Нефть Brent", isUsd: true }, "NG-12.26": { step: 0.001, stepValue: 10, lot: 1000, go: 19000, currency: "RUB", status: "active", name: "Природный газ", isUsd: true }, "GOLD-12.26": { step: 0.01, stepValue: 100, lot: 100, go: 48000, currency: "RUB", status: "active", name: "Золото", isUsd: true }, "SILV-12.26": { step: 0.001, stepValue: 10, lot: 1000, go: 23000, currency: "RUB", status: "active", name: "Серебро", isUsd: true } },
-      "🇺🇸 Индексы акций США": { "SPMX-12.26": { step: 0.01, stepValue: 10, lot: 1, go: 16000, currency: "RUB", status: "active", name: "S&P 500", isUsd: false }, "NDX-12.26": { step: 0.01, stepValue: 10, lot: 1, go: 15000, currency: "RUB", status: "active", name: "Nasdaq 100", isUsd: false }, "RUS-12.26": { step: 0.01, stepValue: 10, lot: 1, go: 14000, currency: "RUB", status: "active", name: "Russell 2000", isUsd: false }, "DJI-12.26": { step: 1, stepValue: 50, lot: 1, go: 45000, currency: "RUB", status: "active", name: "Dow Jones 30", isUsd: true } },
+      "🇺 Индексы акций США": { "SPMX-12.26": { step: 0.01, stepValue: 10, lot: 1, go: 16000, currency: "RUB", status: "active", name: "S&P 500", isUsd: false }, "NDX-12.26": { step: 0.01, stepValue: 10, lot: 1, go: 15000, currency: "RUB", status: "active", name: "Nasdaq 100", isUsd: false }, "RUS-12.26": { step: 0.01, stepValue: 10, lot: 1, go: 14000, currency: "RUB", status: "active", name: "Russell 2000", isUsd: false }, "DJI-12.26": { step: 1, stepValue: 50, lot: 1, go: 45000, currency: "RUB", status: "active", name: "Dow Jones 30", isUsd: true } },
       "🌍 Индексы Азии и Европы": { "NKD-12.26": { step: 1, stepValue: 50, lot: 1, go: 45000, currency: "RUB", status: "active", name: "Nikkei 225", isUsd: true }, "HSI-12.26": { step: 1, stepValue: 50, lot: 1, go: 40000, currency: "RUB", status: "active", name: "Hang Seng", isUsd: true }, "DAX-12.26": { step: 1, stepValue: 50, lot: 1, go: 40000, currency: "RUB", status: "active", name: "DAX 40", isUsd: true }, "STO-12.26": { step: 1, stepValue: 50, lot: 1, go: 35000, currency: "RUB", status: "active", name: "Euro Stoxx 50", isUsd: true } },
       "₿ Криптовалюты (MOEX)": { "BTC-12.26": { step: 1, stepValue: 10, lot: 0.01, go: 30000, currency: "RUB", status: "active", name: "Bitcoin", isUsd: true }, "ETH-12.26": { step: 0.1, stepValue: 1, lot: 0.1, go: 25000, currency: "RUB", status: "active", name: "Ethereum", isUsd: true } },
       "🇷🇺 Индексы РФ и ОФЗ": { "RTS-12.26": { step: 1, stepValue: 20, lot: 1, go: 52000, currency: "RUB", status: "active", name: "Индекс РТС", isUsd: true }, "MXI-12.26": { step: 1, stepValue: 50, lot: 1, go: 35000, currency: "RUB", status: "active", name: "Индекс МосБиржи", isUsd: false }, "RGBI-12.26": { step: 0.01, stepValue: 10, lot: 10, go: 13000, currency: "RUB", status: "active", name: "Индекс ОФЗ", isUsd: false } }
@@ -508,7 +508,7 @@
 
     async function fetchFromMoex() { 
       const code = $("instrument").value; 
-      $("cbrStatus").textContent = "⏳ MOEX API..."; 
+      $("cbrStatus").textContent = " MOEX API..."; 
       $("cbrStatus").className = "status-msg"; 
       try { 
         const res = await fetch(`https://iss.moex.com/iss/engines/futures/markets/indicators/securities/${code}.json`); 
@@ -523,7 +523,7 @@
         $("cbrStatus").textContent = "✅ Спеки MOEX обновлены"; 
         $("cbrStatus").className = "status-msg ok"; 
       } catch(e) { 
-        $("cbrStatus").textContent = "️ Ошибка API"; 
+        $("cbrStatus").textContent = "⚠️ Ошибка API"; 
         $("cbrStatus").className = "status-msg err"; 
       } 
     }
@@ -697,7 +697,7 @@
         $("fxRiskInput").value = fixDecimal($("fxRiskInput").value);
 
         const broker = $("fxBroker").value; const pair = $("fxPair").value;
-        if (!pair) return alert(" Выберите валютную пару!");
+        if (!pair) return alert("❌ Выберите валютную пару!");
         
         const accCur = $("fxAccCur").value; const direction = getToggleValue("fxDirToggle");
         const dep = parseFloat($("fxDeposit").value) || 0; const rType = getToggleValue("fxRiskToggle");
@@ -990,7 +990,7 @@
         const btn = document.querySelector(".copy-btn"); 
         btn.textContent = "✅ Скопировано!"; 
         btn.classList.add("copied"); 
-        setTimeout(() => { btn.textContent = "📋 Копировать уровни для терминала"; btn.classList.remove("copied"); }, 2000); 
+        setTimeout(() => { btn.textContent = " Копировать уровни для терминала"; btn.classList.remove("copied"); }, 2000); 
       }).catch(() => alert("Не удалось скопировать.")); 
     }
     
