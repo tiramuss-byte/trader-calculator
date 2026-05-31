@@ -186,7 +186,7 @@
           <!-- НОВОЕ: ЧЕКБОКС ДЛЯ РАСЧЁТА В ПИПСАХ -->
           <div class="checkbox-row" style="margin: 10px 0; border-top: 1px solid var(--border); padding-top: 10px;">
             <input type="checkbox" id="fxUsePoints" onchange="toggleFxPointsInput()">
-            <label for="fxUsePoints">📏 Рассчитывать SL/TP в пипсах от цены входа</label>
+            <label for="fxUsePoints"> Рассчитывать SL/TP в пипсах от цены входа</label>
           </div>
           
           <!-- ПОЛЯ ДЛЯ ВВОДА В ПИПСАХ (скрыты по умолчанию) -->
@@ -217,6 +217,7 @@
             <div class="hint">Оставьте пустым для расчёта без издержек</div>
           </div>
           <button class="btn" onclick="calcForex()">Рассчитать позицию</button>
+          <button class="btn btn-outline" onclick="exportClassicToSet()" style="margin-top: 8px; border-color: var(--purple); color: var(--purple);">📤 Экспорт в .set файл</button>
         </div>
       </div>
 
@@ -228,7 +229,7 @@
           <div class="row-3">
             <div><label>Депозит ($)</label><input type="number" id="gridDeposit" value="1000" step="any"></div>
             <div><label>Риск (%)</label><input type="number" id="gridRisk" value="2" step="0.1"></div>
-            <div><label>Направление</label><div class="toggle-group" id="gridDirToggle"><button class="active" data-v="long">Long 📉</button><button data-v="short">Short 📈</button></div></div>
+            <div><label>Направление</label><div class="toggle-group" id="gridDirToggle"><button class="active" data-v="long">Long </button><button data-v="short">Short 📈</button></div></div>
           </div>
           
           <!-- ПЕРЕКЛЮЧАТЕЛЬ РЕЖИМОВ -->
@@ -348,7 +349,7 @@
   <script>
     // === ДАННЫЕ ===
     const MOEX_GROUPS = {
-      "💱 Валютные пары": { "Si-12.26": { step: 1, stepValue: 10, lot: 1000, go: 12500, currency: "RUB", status: "active", name: "USD/RUB", isUsd: true }, "ED-12.26": { step: 0.0001, stepValue: 10, lot: 1000, go: 24000, currency: "RUB", status: "active", name: "EUR/RUB", isUsd: false }, "CNY-12.26": { step: 0.0001, stepValue: 1, lot: 1000, go: 9000, currency: "RUB", status: "active", name: "CNY/RUB", isUsd: false }, "UJPY-12.26": { step: 0.01, stepValue: 1, lot: 10, go: 14000, currency: "RUB", status: "active", name: "RUB/JPY", isUsd: false } },
+      " Валютные пары": { "Si-12.26": { step: 1, stepValue: 10, lot: 1000, go: 12500, currency: "RUB", status: "active", name: "USD/RUB", isUsd: true }, "ED-12.26": { step: 0.0001, stepValue: 10, lot: 1000, go: 24000, currency: "RUB", status: "active", name: "EUR/RUB", isUsd: false }, "CNY-12.26": { step: 0.0001, stepValue: 1, lot: 1000, go: 9000, currency: "RUB", status: "active", name: "CNY/RUB", isUsd: false }, "UJPY-12.26": { step: 0.01, stepValue: 1, lot: 10, go: 14000, currency: "RUB", status: "active", name: "RUB/JPY", isUsd: false } },
       "🛢️ Товарные фьючерсы": { "BR-12.26": { step: 0.01, stepValue: 100, lot: 100, go: 38000, currency: "RUB", status: "active", name: "Нефть Brent", isUsd: true }, "NG-12.26": { step: 0.001, stepValue: 10, lot: 1000, go: 19000, currency: "RUB", status: "active", name: "Природный газ", isUsd: true }, "GOLD-12.26": { step: 0.01, stepValue: 100, lot: 100, go: 48000, currency: "RUB", status: "active", name: "Золото", isUsd: true }, "SILV-12.26": { step: 0.001, stepValue: 10, lot: 1000, go: 23000, currency: "RUB", status: "active", name: "Серебро", isUsd: true } },
       "🇺🇸 Индексы акций США": { "SPMX-12.26": { step: 0.01, stepValue: 10, lot: 1, go: 16000, currency: "RUB", status: "active", name: "S&P 500", isUsd: false }, "NDX-12.26": { step: 0.01, stepValue: 10, lot: 1, go: 15000, currency: "RUB", status: "active", name: "Nasdaq 100", isUsd: false }, "RUS-12.26": { step: 0.01, stepValue: 10, lot: 1, go: 14000, currency: "RUB", status: "active", name: "Russell 2000", isUsd: false }, "DJI-12.26": { step: 1, stepValue: 50, lot: 1, go: 45000, currency: "RUB", status: "active", name: "Dow Jones 30", isUsd: true } },
       "🌍 Индексы Азии и Европы": { "NKD-12.26": { step: 1, stepValue: 50, lot: 1, go: 45000, currency: "RUB", status: "active", name: "Nikkei 225", isUsd: true }, "HSI-12.26": { step: 1, stepValue: 50, lot: 1, go: 40000, currency: "RUB", status: "active", name: "Hang Seng", isUsd: true }, "DAX-12.26": { step: 1, stepValue: 50, lot: 1, go: 40000, currency: "RUB", status: "active", name: "DAX 40", isUsd: true }, "STO-12.26": { step: 1, stepValue: 50, lot: 1, go: 35000, currency: "RUB", status: "active", name: "Euro Stoxx 50", isUsd: true } },
@@ -364,7 +365,7 @@
         "NZDUSD": { pip: 0.00001, pipValueUSD: 1.0 }, "EURGBP": { pip: 0.00001, pipValueUSD: 1.25 }, "EURJPY": { pip: 0.001, pipValueUSD: 0.92 }, 
         "EURCHF": { pip: 0.00001, pipValueUSD: 1.1 }, "EURAUD": { pip: 0.00001, pipValueUSD: 0.68 }, "EURCAD": { pip: 0.00001, pipValueUSD: 0.74 }, 
         "GBPJPY": { pip: 0.001, pipValueUSD: 1.28 }, "GBPCHF": { pip: 0.00001, pipValueUSD: 1.25 }, "AUDJPY": { pip: 0.001, pipValueUSD: 0.68 }, 
-        "AUDCAD": { pip: 0.00001, pipValueUSD: 0.74 }, "CADJPY": { pip: 0.001, pipValueUSD: 0.74 }, "NZDJPY": { pip: 0.001, pipValueUSD: 0.65 }, 
+        "AUDCAD": { pip: 0.00001, pipValueUSD: 0.74 }, "CADJPY": { pip: 0.001, pipValueUSD: 0.74 }, "NZDJPY": { pip: 0.001, pipValueUSD: 0.65 }, "NZDCAD": { pip: 0.00001, pipValueUSD: 1.0 },
         "USDTRY": { pip: 0.00001, pipValueUSD: 0.28 }, "USDZAR": { pip: 0.00001, pipValueUSD: 0.55 }, 
         "XAUUSD": { pip: 0.01, pipValueUSD: 1.0 }, "XAGUSD": { pip: 0.001, pipValueUSD: 1.0 }, 
         "XPTUSD": { pip: 0.01, pipValueUSD: 1.0 }, "XPDUSD": { pip: 0.01, pipValueUSD: 1.0 } 
@@ -469,7 +470,7 @@
     function renderInstruments() {
       const moexSel = $("instrument"); if (moexSel) { moexSel.innerHTML = ""; for (const [gn, inst] of Object.entries(MOEX_GROUPS)) { const og = document.createElement("optgroup"); og.label = gn; for (const [c, v] of Object.entries(inst)) { const o = document.createElement("option"); o.value = c; o.textContent = `${c} — ${v.name}`; og.appendChild(o); } moexSel.appendChild(og); } }
       const cryptoSel = $("cryptoInstrument"); if (cryptoSel) { cryptoSel.innerHTML = ""; Object.entries(specs.crypto || {}).forEach(([k, v]) => { const o = document.createElement("option"); o.value = k; o.textContent = k; cryptoSel.appendChild(o); }); }
-      const fxSel = $("fxPair"), gridSel = $("gridPair"); if (fxSel) { fxSel.innerHTML = ""; const grps = { "💱 Мажоры": ["EURUSD","GBPUSD","USDJPY","USDCHF","AUDUSD","USDCAD","NZDUSD"], "💱 Кроссы": ["EURGBP","EURJPY","EURCHF","EURAUD","EURCAD","GBPJPY","GBPCHF","AUDJPY","AUDCAD","CADJPY","NZDJPY"], "🌍 Экзотика": ["USDTRY","USDZAR","USDMXN","USDSEK","USDNOK","USDPLN","USDCZK","USDHUF","USDILS","USDSGD","USDHKD","USDRUB","EURTRY","EURZAR","EURPLN","GBPTRY","GBPZAR","GBPPLN","TRYJPY","ZARJPY"], "🥇 Металлы": ["XAUUSD","XAGUSD","XPTUSD","XPDUSD"], "🛢️ Товары": ["#WTI"] }; for (const [gn, ps] of Object.entries(grps)) { const og = document.createElement("optgroup"); og.label = gn; for (const p of ps) { if (specs.forex[p] || BROKER_PROFILES.rusfx?.instruments?.[p]) { const o = document.createElement("option"); o.value = p; o.textContent = p; og.appendChild(o); } } fxSel.appendChild(og); } } if (gridSel) gridSel.innerHTML = fxSel?.innerHTML || ""; if (currentMarket === "moex") $("instrument").dispatchEvent(new Event("change")); if (currentMarket === "forex") { if (fxSel) fxSel.dispatchEvent(new Event("change")); if (gridSel) gridSel.dispatchEvent(new Event("change")); }
+      const fxSel = $("fxPair"), gridSel = $("gridPair"); if (fxSel) { fxSel.innerHTML = ""; const grps = { " Мажоры": ["EURUSD","GBPUSD","USDJPY","USDCHF","AUDUSD","USDCAD","NZDUSD"], "💱 Кроссы": ["EURGBP","EURJPY","EURCHF","EURAUD","EURCAD","GBPJPY","GBPCHF","AUDJPY","AUDCAD","CADJPY","NZDJPY","NZDCAD"], "🌍 Экзотика": ["USDTRY","USDZAR","USDMXN","USDSEK","USDNOK","USDPLN","USDCZK","USDHUF","USDILS","USDSGD","USDHKD","USDRUB","EURTRY","EURZAR","EURPLN","GBPTRY","GBPZAR","GBPPLN","TRYJPY","ZARJPY"], "🥇 Металлы": ["XAUUSD","XAGUSD","XPTUSD","XPDUSD"], "🛢️ Товары": ["#WTI"] }; for (const [gn, ps] of Object.entries(grps)) { const og = document.createElement("optgroup"); og.label = gn; for (const p of ps) { if (specs.forex[p] || BROKER_PROFILES.rusfx?.instruments?.[p]) { const o = document.createElement("option"); o.value = p; o.textContent = p; og.appendChild(o); } } fxSel.appendChild(og); } } if (gridSel) gridSel.innerHTML = fxSel?.innerHTML || ""; if (currentMarket === "moex") $("instrument").dispatchEvent(new Event("change")); if (currentMarket === "forex") { if (fxSel) fxSel.dispatchEvent(new Event("change")); if (gridSel) gridSel.dispatchEvent(new Event("change")); }
     }
 
     function updateDepositLabel() {
@@ -787,7 +788,32 @@
         else { $("tpRow").classList.add("hidden"); $("rrRow").classList.add("hidden"); }
         
         $("results").classList.remove("hidden");
+        
+        // Сохраняем для экспорта
+        window.fxClassicExportData = { pair, direction, entry, stop, tp, lotsStandard };
       } catch (e) { alert("Ошибка: " + e.message); }
+    }
+
+    // === ЭКСПОРТ КЛАССИЧЕСКИЙ FOREX ===
+    function exportClassicToSet() {
+        if (!window.fxClassicExportData) return alert("Сначала рассчитайте позицию!");
+        const d = window.fxClassicExportData;
+        let content = `InpMagic=20240528\n`;
+        content += `InpDirection=${d.direction === 'long' ? 'ORDER_TYPE_BUY' : 'ORDER_TYPE_SELL'}\n`;
+        content += `InpTotalLevels=1\n`;
+        content += `Price1=${formatPrice(d.pair, d.entry)}\n`;
+        content += `Lot1=${d.lotsStandard.toFixed(2)}\n`;
+        content += `SL1=${formatPrice(d.pair, d.stop)}\n`;
+        content += `TP1=${formatPrice(d.pair, d.tp)}\n`;
+        
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'GridBot_Classic.set';
+        a.click();
+        URL.revokeObjectURL(url);
+        alert('📄 Файл GridBot_Classic.set скачан!');
     }
 
     // === СЕТКА ===
@@ -802,12 +828,26 @@
       if (mode === 'coef') {
         $('gridCoefFields').classList.remove('hidden');
         $('gridBudgetFields').classList.add('hidden');
+        // Показываем множители
+        document.querySelectorAll('.inp-mult').forEach(i => i.parentElement.classList.remove('hidden'));
+        document.querySelector('.fee-label').parentElement.classList.remove('hidden'); // Заголовок множителя
       } else {
         $('gridCoefFields').classList.add('hidden');
         $('gridBudgetFields').classList.remove('hidden');
+        // Скрываем множители
+        document.querySelectorAll('.inp-mult').forEach(i => i.parentElement.classList.add('hidden'));
+        document.querySelector('.fee-label').parentElement.classList.add('hidden'); // Заголовок множителя
       }
     }
     
+    // === ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ: ФОРМАТИРОВАНИЕ ЦЕН ===
+    function formatPrice(pair, price) {
+        if (!price) return "";
+        if (pair === "XAUUSD" || pair.includes("GOLD")) return parseFloat(price).toFixed(2);
+        if (pair === "XAGUSD" || pair.includes("SILV")) return parseFloat(price).toFixed(4);
+        return parseFloat(price).toFixed(5);
+    }
+
     // === РАСЧЁТ СЕТКИ (ОБНОВЛЁННЫЙ) ===
     function calcGrid() {
       try {
@@ -889,11 +929,11 @@
           
           totalRiskCalc += lotStandard * distToSL * pipValueStandard;
           
-          let slPrice = (direction === "long" ? price - (slPipsUsed * pipSize) : price + (slPipsUsed * pipSize)).toFixed(5);
+          let slPrice = (direction === "long" ? price - (slPipsUsed * pipSize) : price + (slPipsUsed * pipSize));
           
           let tpPrice = "-";
           if (!isNaN(tpPipsInput)) {
-            tpPrice = (direction === "long" ? price + (tpPipsInput * pipSize) : price - (tpPipsInput * pipSize)).toFixed(5);
+            tpPrice = (direction === "long" ? price + (tpPipsInput * pipSize) : price - (tpPipsInput * pipSize));
           }
           
           const margin = (price * lotStandard * 100000) / leverage;
@@ -904,7 +944,9 @@
         });
         
         const avgEntry = weightedSum / totalLots;
-        const globalSLPrice = (direction === "long" ? entry - (globalSLPips * pipSize) : entry + (globalSLPips * pipSize)).toFixed(5);
+        // ИСПРАВЛЕНИЕ: Считаем стоп от последнего уровня
+        const lastPrice = direction === "long" ? entry - ((rows.length - 1) * stepPips * pipSize) : entry + ((rows.length - 1) * stepPips * pipSize);
+        const globalSLPrice = direction === "long" ? lastPrice - (globalSLPips * pipSize) : lastPrice + (globalSLPips * pipSize);
         
         let swapTotal = 0;
         if (useSwap) {
@@ -915,14 +957,14 @@
         const tbody = $("gridTableBody");
         tbody.innerHTML = "";
         orders.forEach(o => {
-          tbody.innerHTML += `<tr><td>${o.num}</td><td>${o.price.toFixed(5)}</td><td class="val">${o.lot.toFixed(2)}</td><td style="color:var(--accent)">${o.num === 1 ? '—' : (o.lot > orders[o.num-2].lot ? '+' : '') + (o.lot - orders[o.num-2].lot).toFixed(2)}</td><td style="color:var(--red)">${o.slPrice}</td><td style="color:var(--green)">${o.tpPrice}</td></tr>`;
+          tbody.innerHTML += `<tr><td>${o.num}</td><td>${formatPrice(pair, o.price)}</td><td class="val">${o.lot.toFixed(2)}</td><td style="color:var(--accent)">${o.num === 1 ? '—' : (o.lot > orders[o.num-2].lot ? '+' : '') + (o.lot - orders[o.num-2].lot).toFixed(2)}</td><td style="color:var(--red)">${formatPrice(pair, o.slPrice)}</td><td style="color:var(--green)">${o.tpPrice !== '-' ? formatPrice(pair, o.tpPrice) : '-'}</td></tr>`;
         });
-        tbody.innerHTML += `<tr style="background:#1e1e24; border-top:2px solid var(--red)"><td colspan="3" style="color:var(--red); font-weight:bold; padding:8px">🛑 СТОП СЕТКИ</td><td>-</td><td colspan="2" style="color:var(--red); font-weight:bold">${globalSLPrice}</td></tr>`;
+        tbody.innerHTML += `<tr style="background:#1e1e24; border-top:2px solid var(--red)"><td colspan="3" style="color:var(--red); font-weight:bold; padding:8px">🛑 СТОП СЕТКИ</td><td>-</td><td colspan="2" style="color:var(--red); font-weight:bold">${formatPrice(pair, globalSLPrice)}</td></tr>`;
         
         $("gridTargetRisk").textContent = `$${targetRisk.toFixed(2)} (${riskPct}%)`;
         $("gridTotalRisk").textContent = `$${totalRiskCalc.toFixed(2)}`;
         $("gridTotalLots").textContent = `${totalLots.toFixed(2)} лотов`;
-        $("gridAvgEntry").textContent = avgEntry.toFixed(5);
+        $("gridAvgEntry").textContent = formatPrice(pair, avgEntry);
         $("gridMargin").textContent = `$${totalMargin.toFixed(2)}`;
         $("gridSwapTotal").textContent = `$${swapTotal.toFixed(2)}`;
         $("gridSwapRowRes").classList.toggle("hidden", !useSwap);
@@ -936,12 +978,12 @@
     function copyGridLevels() { 
       if (!window.gridExportData) return; 
       const { orders, pair, direction, avgEntry, slPrice } = window.gridExportData; 
-      let text = `# Grid: ${pair} ${direction.toUpperCase()}\n# Avg Entry: ${avgEntry.toFixed(5)} | Global SL: ${slPrice}\n\n`; 
+      let text = `# Grid: ${pair} ${direction.toUpperCase()}\n# Avg Entry: ${formatPrice(pair, avgEntry)} | Global SL: ${formatPrice(pair, slPrice)}\n\n`; 
       orders.forEach(o => { 
         const type = direction === "long" ? "BUY LIMIT" : "SELL LIMIT"; 
-        text += `${type} ${o.lot.toFixed(2)} ${pair} @ ${o.price.toFixed(5)}\n`; 
+        text += `${type} ${o.lot.toFixed(2)} ${pair} @ ${formatPrice(pair, o.price)}\n`; 
       }); 
-      text += `\nSTOP LOSS: ${slPrice}`; 
+      text += `\nSTOP LOSS: ${formatPrice(pair, slPrice)}`; 
       navigator.clipboard.writeText(text).then(() => { 
         const btn = document.querySelector(".copy-btn"); 
         btn.textContent = "✅ Скопировано!"; 
@@ -950,7 +992,7 @@
       }).catch(() => alert("Не удалось скопировать.")); 
     }
     
-    // === НОВАЯ ФУНКЦИЯ: ЭКСПОРТ В .SET ФАЙЛ ===
+    // === НОВАЯ ФУНКЦИЯ: ЭКСПОРТ В .SET ФАЙЛ (СЕТКА) ===
     function exportGridToSet() {
       if (!window.gridExportData) return alert("Сначала рассчитайте сетку!");
       const { orders, pair, direction, slPrice } = window.gridExportData;
@@ -961,10 +1003,10 @@
       
       orders.forEach((o, i) => {
         const n = i + 1;
-        content += `Price${n}=${o.price.toFixed(5)}\n`;
+        content += `Price${n}=${formatPrice(pair, o.price)}\n`;
         content += `Lot${n}=${o.lot.toFixed(2)}\n`;
-        content += `SL${n}=${slPrice}\n`;
-        content += `TP${n}=${o.tpPrice !== '-' ? o.tpPrice : slPrice}\n`;
+        content += `SL${n}=${formatPrice(pair, slPrice)}\n`;
+        content += `TP${n}=${o.tpPrice !== '-' ? formatPrice(pair, o.tpPrice) : formatPrice(pair, slPrice)}\n`;
       });
       
       const blob = new Blob([content], { type: 'text/plain' });
