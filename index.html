@@ -36,7 +36,7 @@
         th { background: #f8f9fa; font-weight: 600; color: #495057; }
         .checkbox-wrapper { display: flex; align-items: center; gap: 10px; margin: 10px 0; }
         .checkbox-wrapper input[type="checkbox"] { width: auto; }
-        .radio-group { display: flex; gap: 15px; margin: 15px 0; }
+        .radio-group { display: flex; gap: 15px; margin: 15px 0; flex-wrap: wrap; }
         .radio-group label { display: flex; align-items: center; gap: 5px; cursor: pointer; font-weight: normal; }
         .radio-group input[type="radio"] { width: auto; }
         @media (max-width: 768px) { .row { grid-template-columns: 1fr; } }
@@ -54,7 +54,7 @@
             <button class="tab" onclick="switchTab('forex')">Forex</button>
         </div>
 
-        <!-- MOEX TAB -->
+        <!-- MOEX TAB - БЕЗ ИЗМЕНЕНИЙ -->
         <div id="moex" class="tab-content active">
             <div class="info">💡 Standard: 1 лот = 100 000 ед. | Пункт ≈ $1.00</div>
             <div class="form-group">
@@ -73,7 +73,7 @@
             <div id="moexResult" class="result"></div>
         </div>
 
-        <!-- CRYPTO TAB -->
+        <!-- CRYPTO TAB - БЕЗ ИЗМЕНЕНИЙ -->
         <div id="crypto" class="tab-content">
             <div class="info">💡 ProCent: 1 лот = 1 000 ед. | Пункт ≈ $0.01</div>
             <div class="form-group">
@@ -226,22 +226,22 @@
                     </div>
                 </div>
 
-                <!-- НОВЫЕ ПОЛЯ -->
+                <!-- НОВОЕ: ПЕРЕКЛЮЧАТЕЛЬ РЕЖИМОВ -->
                 <div class="form-group">
                     <label>Режим расчёта сетки:</label>
                     <div class="radio-group">
                         <label>
                             <input type="radio" name="gridMode" value="coefficient" checked onchange="toggleGridMode()">
-                            По коэффициенту (старый режим)
+                            🔹 По коэффициенту (старый режим)
                         </label>
                         <label>
                             <input type="radio" name="gridMode" value="budget" onchange="toggleGridMode()">
-                            По общему риску (новый режим)
+                            🔹 По общему риску (новый режим)
                         </label>
                     </div>
                 </div>
 
-                <!-- Поля для режима "по коэффициенту" -->
+                <!-- Поля для режима "по коэффициенту" (старые) -->
                 <div id="coefficientFields">
                     <div class="row">
                         <div class="form-group">
@@ -251,7 +251,7 @@
                     </div>
                 </div>
 
-                <!-- Поля для режима "по бюджету" -->
+                <!-- Поля для режима "по бюджету" (НОВЫЕ) -->
                 <div id="budgetFields" style="display:none;">
                     <div class="row">
                         <div class="form-group">
