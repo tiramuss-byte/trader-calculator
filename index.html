@@ -94,16 +94,15 @@
       <button class="tab active" data-m="moex">Мосбиржа</button>
       <button class="tab" data-m="crypto">Крипто</button>
       <button class="tab" data-m="forex">Forex</button>
-      <button class="tab" onclick="fetchCBR()"> Курс ЦБ РФ</button>
     </div>
 
     <!-- МОСБИРЖА -->
     <div id="panel-moex" class="panel">
       <div class="card">
         <div class="toolbar">
-          <button class="btn-outline" onclick="fetchCBR()"> Курс ЦБ РФ</button>
+          <button class="btn-outline" onclick="fetchCBR()">📈 Курс ЦБ РФ</button>
           <button class="btn-outline" onclick="fetchFromMoex()">📥 MOEX API</button>
-          <button class="btn-outline" onclick="openEditor()">️ Ред. спеки</button>
+          <button class="btn-outline" onclick="openEditor()">✏️ Ред. спеки</button>
         </div>
         <label>Инструмент</label><select id="instrument"></select>
         <div class="spec-box" id="moexSpecs">
@@ -150,7 +149,7 @@
       </div>
       
       <!-- Классический -->
-      <div id="panel-forex-classic" class="hidden">
+      <div id="panel-forex-classic">
         <div class="card">
           <div class="row">
              <select id="fxBroker"><option value="roboforex">RoboForex</option><option value="rusfx">Российский форекс</option><option value="custom">Custom</option></select>
@@ -187,7 +186,7 @@
           <!-- НОВОЕ: ЧЕКБОКС ДЛЯ РАСЧЁТА В ПИПСАХ -->
           <div class="checkbox-row" style="margin: 10px 0; border-top: 1px solid var(--border); padding-top: 10px;">
             <input type="checkbox" id="fxUsePoints" onchange="toggleFxPointsInput()">
-            <label for="fxUsePoints"> Рассчитывать SL/TP в пипсах от цены входа</label>
+            <label for="fxUsePoints">📏 Рассчитывать SL/TP в пипсах от цены входа</label>
           </div>
           
           <!-- ПОЛЯ ДЛЯ ВВОДА В ПИПСАХ (скрыты по умолчанию) -->
@@ -300,16 +299,16 @@
             <div class="spec-row"><span class="spec-label">Требуемая маржа:</span><span class="val" id="gridMargin">-</span></div>
             <div class="spec-row" id="gridSwapRowRes"><span class="spec-label">Своп (за период):</span><span class="val red" id="gridSwapTotal">-</span></div>
           </div>
-          <button class="copy-btn" onclick="copyGridLevels()"> Копировать уровни для терминала</button>
+          <button class="copy-btn" onclick="copyGridLevels()">📋 Копировать уровни для терминала</button>
         </div>
       </div>
     </div>
 
-    <!-- Синхронизация настроек -->
+    <!-- Синхронизация настроек (внизу, не таб) -->
     <div class="card sync-card">
       <h3 style="margin:0 0 8px; font-size:1rem;">💾 Синхронизация настроек</h3>
       <div class="toolbar">
-        <button class="btn-outline" onclick="exportSettings()"> Скачать настройки</button>
+        <button class="btn-outline" onclick="exportSettings()">💾 Скачать настройки</button>
         <button class="btn-outline" onclick="document.getElementById('fileInput').click()">📂 Загрузить настройки</button>
         <input type="file" id="fileInput" accept=".json" hidden onchange="importSettings(this)">
       </div>
@@ -351,10 +350,10 @@
     const MOEX_GROUPS = {
       "💱 Валютные пары": { "Si-12.26": { step: 1, stepValue: 10, lot: 1000, go: 12500, currency: "RUB", status: "active", name: "USD/RUB", isUsd: true }, "ED-12.26": { step: 0.0001, stepValue: 10, lot: 1000, go: 24000, currency: "RUB", status: "active", name: "EUR/RUB", isUsd: false }, "CNY-12.26": { step: 0.0001, stepValue: 1, lot: 1000, go: 9000, currency: "RUB", status: "active", name: "CNY/RUB", isUsd: false }, "UJPY-12.26": { step: 0.01, stepValue: 1, lot: 10, go: 14000, currency: "RUB", status: "active", name: "RUB/JPY", isUsd: false } },
       "🛢️ Товарные фьючерсы": { "BR-12.26": { step: 0.01, stepValue: 100, lot: 100, go: 38000, currency: "RUB", status: "active", name: "Нефть Brent", isUsd: true }, "NG-12.26": { step: 0.001, stepValue: 10, lot: 1000, go: 19000, currency: "RUB", status: "active", name: "Природный газ", isUsd: true }, "GOLD-12.26": { step: 0.01, stepValue: 100, lot: 100, go: 48000, currency: "RUB", status: "active", name: "Золото", isUsd: true }, "SILV-12.26": { step: 0.001, stepValue: 10, lot: 1000, go: 23000, currency: "RUB", status: "active", name: "Серебро", isUsd: true } },
-      "🇺 Индексы акций США": { "SPMX-12.26": { step: 0.01, stepValue: 10, lot: 1, go: 16000, currency: "RUB", status: "active", name: "S&P 500", isUsd: false }, "NDX-12.26": { step: 0.01, stepValue: 10, lot: 1, go: 15000, currency: "RUB", status: "active", name: "Nasdaq 100", isUsd: false }, "RUS-12.26": { step: 0.01, stepValue: 10, lot: 1, go: 14000, currency: "RUB", status: "active", name: "Russell 2000", isUsd: false }, "DJI-12.26": { step: 1, stepValue: 50, lot: 1, go: 45000, currency: "RUB", status: "active", name: "Dow Jones 30", isUsd: true } },
-      " Индексы Азии и Европы": { "NKD-12.26": { step: 1, stepValue: 50, lot: 1, go: 45000, currency: "RUB", status: "active", name: "Nikkei 225", isUsd: true }, "HSI-12.26": { step: 1, stepValue: 50, lot: 1, go: 40000, currency: "RUB", status: "active", name: "Hang Seng", isUsd: true }, "DAX-12.26": { step: 1, stepValue: 50, lot: 1, go: 40000, currency: "RUB", status: "active", name: "DAX 40", isUsd: true }, "STO-12.26": { step: 1, stepValue: 50, lot: 1, go: 35000, currency: "RUB", status: "active", name: "Euro Stoxx 50", isUsd: true } },
+      "🇺🇸 Индексы акций США": { "SPMX-12.26": { step: 0.01, stepValue: 10, lot: 1, go: 16000, currency: "RUB", status: "active", name: "S&P 500", isUsd: false }, "NDX-12.26": { step: 0.01, stepValue: 10, lot: 1, go: 15000, currency: "RUB", status: "active", name: "Nasdaq 100", isUsd: false }, "RUS-12.26": { step: 0.01, stepValue: 10, lot: 1, go: 14000, currency: "RUB", status: "active", name: "Russell 2000", isUsd: false }, "DJI-12.26": { step: 1, stepValue: 50, lot: 1, go: 45000, currency: "RUB", status: "active", name: "Dow Jones 30", isUsd: true } },
+      "🌍 Индексы Азии и Европы": { "NKD-12.26": { step: 1, stepValue: 50, lot: 1, go: 45000, currency: "RUB", status: "active", name: "Nikkei 225", isUsd: true }, "HSI-12.26": { step: 1, stepValue: 50, lot: 1, go: 40000, currency: "RUB", status: "active", name: "Hang Seng", isUsd: true }, "DAX-12.26": { step: 1, stepValue: 50, lot: 1, go: 40000, currency: "RUB", status: "active", name: "DAX 40", isUsd: true }, "STO-12.26": { step: 1, stepValue: 50, lot: 1, go: 35000, currency: "RUB", status: "active", name: "Euro Stoxx 50", isUsd: true } },
       "₿ Криптовалюты (MOEX)": { "BTC-12.26": { step: 1, stepValue: 10, lot: 0.01, go: 30000, currency: "RUB", status: "active", name: "Bitcoin", isUsd: true }, "ETH-12.26": { step: 0.1, stepValue: 1, lot: 0.1, go: 25000, currency: "RUB", status: "active", name: "Ethereum", isUsd: true } },
-      "🇷 Индексы РФ и ОФЗ": { "RTS-12.26": { step: 1, stepValue: 20, lot: 1, go: 52000, currency: "RUB", status: "active", name: "Индекс РТС", isUsd: true }, "MXI-12.26": { step: 1, stepValue: 50, lot: 1, go: 35000, currency: "RUB", status: "active", name: "Индекс МосБиржи", isUsd: false }, "RGBI-12.26": { step: 0.01, stepValue: 10, lot: 10, go: 13000, currency: "RUB", status: "active", name: "Индекс ОФЗ", isUsd: false } }
+      "🇷🇺 Индексы РФ и ОФЗ": { "RTS-12.26": { step: 1, stepValue: 20, lot: 1, go: 52000, currency: "RUB", status: "active", name: "Индекс РТС", isUsd: true }, "MXI-12.26": { step: 1, stepValue: 50, lot: 1, go: 35000, currency: "RUB", status: "active", name: "Индекс МосБиржи", isUsd: false }, "RGBI-12.26": { step: 0.01, stepValue: 10, lot: 10, go: 13000, currency: "RUB", status: "active", name: "Индекс ОФЗ", isUsd: false } }
     };
     const DEFAULT_SPECS = { 
       moex: {}, 
@@ -456,15 +455,21 @@
       if (currentMarket === 'moex') $('panel-moex').classList.remove('hidden'); 
       else if (currentMarket === 'crypto') $('panel-crypto').classList.remove('hidden'); 
       else if (currentMarket === 'forex') { 
-        if (currentFxMode === 'grid') $('panel-forex-grid').classList.remove('hidden'); 
-        else $('panel-forex-classic').classList.remove('hidden'); 
+        $('panel-forex').classList.remove('hidden');
+        if (currentFxMode === 'grid') {
+          $('panel-forex-grid').classList.remove('hidden');
+          $('panel-forex-classic').classList.add('hidden');
+        } else {
+          $('panel-forex-classic').classList.remove('hidden');
+          $('panel-forex-grid').classList.add('hidden');
+        }
       } 
     }
     
     function renderInstruments() {
       const moexSel = $("instrument"); if (moexSel) { moexSel.innerHTML = ""; for (const [gn, inst] of Object.entries(MOEX_GROUPS)) { const og = document.createElement("optgroup"); og.label = gn; for (const [c, v] of Object.entries(inst)) { const o = document.createElement("option"); o.value = c; o.textContent = `${c} — ${v.name}`; og.appendChild(o); } moexSel.appendChild(og); } }
       const cryptoSel = $("cryptoInstrument"); if (cryptoSel) { cryptoSel.innerHTML = ""; Object.entries(specs.crypto || {}).forEach(([k, v]) => { const o = document.createElement("option"); o.value = k; o.textContent = k; cryptoSel.appendChild(o); }); }
-      const fxSel = $("fxPair"), gridSel = $("gridPair"); if (fxSel) { fxSel.innerHTML = ""; const grps = { "💱 Мажоры": ["EURUSD","GBPUSD","USDJPY","USDCHF","AUDUSD","USDCAD","NZDUSD"], " Кроссы": ["EURGBP","EURJPY","EURCHF","EURAUD","EURCAD","GBPJPY","GBPCHF","AUDJPY","AUDCAD","CADJPY","NZDJPY"], " Экзотика": ["USDTRY","USDZAR","USDMXN","USDSEK","USDNOK","USDPLN","USDCZK","USDHUF","USDILS","USDSGD","USDHKD","USDRUB","EURTRY","EURZAR","EURPLN","GBPTRY","GBPZAR","GBPPLN","TRYJPY","ZARJPY"], "🥇 Металлы": ["XAUUSD","XAGUSD","XPTUSD","XPDUSD"], "🛢️ Товары": ["#WTI"] }; for (const [gn, ps] of Object.entries(grps)) { const og = document.createElement("optgroup"); og.label = gn; for (const p of ps) { if (specs.forex[p] || BROKER_PROFILES.rusfx?.instruments?.[p]) { const o = document.createElement("option"); o.value = p; o.textContent = p; og.appendChild(o); } } fxSel.appendChild(og); } } if (gridSel) gridSel.innerHTML = fxSel?.innerHTML || ""; if (currentMarket === "moex") $("instrument").dispatchEvent(new Event("change")); if (currentMarket === "forex") { if (fxSel) fxSel.dispatchEvent(new Event("change")); if (gridSel) gridSel.dispatchEvent(new Event("change")); }
+      const fxSel = $("fxPair"), gridSel = $("gridPair"); if (fxSel) { fxSel.innerHTML = ""; const grps = { "💱 Мажоры": ["EURUSD","GBPUSD","USDJPY","USDCHF","AUDUSD","USDCAD","NZDUSD"], "💱 Кроссы": ["EURGBP","EURJPY","EURCHF","EURAUD","EURCAD","GBPJPY","GBPCHF","AUDJPY","AUDCAD","CADJPY","NZDJPY"], "🌍 Экзотика": ["USDTRY","USDZAR","USDMXN","USDSEK","USDNOK","USDPLN","USDCZK","USDHUF","USDILS","USDSGD","USDHKD","USDRUB","EURTRY","EURZAR","EURPLN","GBPTRY","GBPZAR","GBPPLN","TRYJPY","ZARJPY"], "🥇 Металлы": ["XAUUSD","XAGUSD","XPTUSD","XPDUSD"], "🛢️ Товары": ["#WTI"] }; for (const [gn, ps] of Object.entries(grps)) { const og = document.createElement("optgroup"); og.label = gn; for (const p of ps) { if (specs.forex[p] || BROKER_PROFILES.rusfx?.instruments?.[p]) { const o = document.createElement("option"); o.value = p; o.textContent = p; og.appendChild(o); } } fxSel.appendChild(og); } } if (gridSel) gridSel.innerHTML = fxSel?.innerHTML || ""; if (currentMarket === "moex") $("instrument").dispatchEvent(new Event("change")); if (currentMarket === "forex") { if (fxSel) fxSel.dispatchEvent(new Event("change")); if (gridSel) gridSel.dispatchEvent(new Event("change")); }
     }
 
     function updateDepositLabel() {
@@ -502,7 +507,7 @@
 
     async function fetchFromMoex() { 
       const code = $("instrument").value; 
-      $("cbrStatus").textContent = " MOEX API..."; 
+      $("cbrStatus").textContent = "⏳ MOEX API..."; 
       $("cbrStatus").className = "status-msg"; 
       try { 
         const res = await fetch(`https://iss.moex.com/iss/engines/futures/markets/indicators/securities/${code}.json`); 
@@ -555,14 +560,6 @@
     function toggleFxPointsInput() {
       const usePoints = $("fxUsePoints").checked;
       $("fxPointsInputs").classList.toggle("hidden", !usePoints);
-      // Если включили пипсы, скрываем поля цен (чтобы не путать)
-      if(usePoints) {
-         $("fxStop").classList.add("hidden");
-         $("fxTP").classList.add("hidden");
-      } else {
-         $("fxStop").classList.remove("hidden");
-         $("fxTP").classList.remove("hidden");
-      }
     }
 
     // === РАСЧЁТ МОСБИРЖИ ===
@@ -979,6 +976,16 @@
       URL.revokeObjectURL(url);
       
       alert('📄 Файл GridBot_Settings.set скачан!');
+    }
+
+    // === ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ===
+    function getPairSpec(pair, broker) { 
+      if (specs.forex[pair]) return specs.forex[pair]; 
+      if (broker === "rusfx" && BROKER_PROFILES.rusfx?.instruments?.[pair]) { 
+        return { pip: BROKER_PROFILES.rusfx.instruments[pair].pip || 0.00001, pipValueUSD: BROKER_PROFILES.rusfx.instruments[pair].pipValueUSD || 1.0 }; 
+      } 
+      if (pair.includes("JPY") || pair.includes("XAU")) return { pip: 0.01, pipValueUSD: 1.0 }; 
+      return { pip: 0.00001, pipValueUSD: 1.0 }; 
     }
 
     // === УТИЛИТЫ ===
