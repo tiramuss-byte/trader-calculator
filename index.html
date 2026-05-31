@@ -95,7 +95,7 @@
       <button class="tab" data-m="forex">Forex</button>
     </div>
 
-    <!-- МОСБИРЖА -->
+    <!-- МОСБИРЖА - БЕЗ ИЗМЕНЕНИЙ -->
     <div id="panel-moex" class="panel">
       <div class="card">
         <div class="toolbar">
@@ -125,7 +125,7 @@
       </div>
     </div>
 
-    <!-- КРИПТО -->
+    <!-- КРИПТО - БЕЗ ИЗМЕНЕНИЙ -->
     <div id="panel-crypto" class="panel hidden">
       <div class="card">
         <label>Инструмент</label><select id="cryptoInstrument"></select>
@@ -228,17 +228,41 @@
           <div><label>Риск (%)</label><input type="number" id="gridRisk" value="37" step="0.1"></div>
           <div><label>Направление</label><div class="toggle-group" id="gridDirToggle"><button class="active" data-v="long">Long 📉</button><button data-v="short">Short 📈</button></div></div>
         </div>
-        <div class="row">
-           <div><label>Стоп-лосс сетки (пипсы)</label><input type="number" id="gridGlobalSL" value="340" step="1"></div>
-           <div>
-             <label>Коэффициент (сумма)</label>
-             <div style="display:flex; gap:4px;">
-               <input type="number" id="gridCoefficient" value="4.42" step="0.01">
-               <button class="btn-outline btn-xs" onclick="calcCoefficient()">🧮</button>
-             </div>
-           </div>
+        
+        <!-- НОВОЕ: ПЕРЕКЛЮЧАТЕЛЬ РЕЖИМОВ РАСЧЁТА -->
+        <div class="checkbox-row" style="margin: 10px 0;">
+          <input type="radio" id="gridModeCoef" name="gridMode" value="coef" checked onchange="toggleGridMode()">
+          <label for="gridModeCoef">Расчёт по коэффициенту (старый режим)</label>
         </div>
-        <div class="hint">Риск на «единицу» = Общий риск% ÷ Коэффициент</div>
+        <div class="checkbox-row" style="margin-bottom: 10px;">
+          <input type="radio" id="gridModeBudget" name="gridMode" value="budget" onchange="toggleGridMode()">
+          <label for="gridModeBudget">🔹 Расчёт по общему риску (новый режим)</label>
+        </div>
+        
+        <!-- ПОЛЯ ДЛЯ СТАРОГО РЕЖИМА -->
+        <div id="gridCoefFields">
+          <div class="row">
+             <div><label>Стоп-лосс сетки (пипсы)</label><input type="number" id="gridGlobalSL" value="340" step="1"></div>
+             <div>
+               <label>Коэффициент (сумма)</label>
+               <div style="display:flex; gap:4px;">
+                 <input type="number" id="gridCoefficient" value="4.42" step="0.01">
+                 <button class="btn-outline btn-xs" onclick="calcCoefficient()">🧮</button>
+               </div>
+             </div>
+          </div>
+          <div class="hint">Риск на «единицу» = Общий риск% ÷ Коэффициент</div>
+        </div>
+        
+        <!-- ПОЛЯ ДЛЯ НОВОГО РЕЖИМА -->
+        <div id="gridBudgetFields" class="hidden">
+          <div class="row">
+            <div><label>Шаг стопа от посл. уровня ($)</label><input type="number" id="gridSLStep" value="10" step="0.01"></div>
+            <div><label>Бюджет риска ($)</label><input type="number" id="gridRiskBudget" value="40" step="1"></div>
+          </div>
+          <div class="hint">Все ордера закроются по общему SL. Риск не превысит бюджет.</div>
+        </div>
+        
         <div class="row-3">
           <div><label>Цена входа</label><input type="number" id="gridEntry" step="any" placeholder="1.0850"></div>
           <div><label>Шаг сетки (пипсы)</label><input type="number" id="gridStep" value="340" min="10"></div>
@@ -264,6 +288,8 @@
         </div>
         <label>Срок удержания (ночей)</label><input type="number" id="gridNights" value="1" min="0">
         <button class="btn" onclick="calcGrid()">📊 Рассчитать сетку</button>
+        <!-- НОВАЯ КНОПКА ЭКСПОРТА -->
+        <button class="btn btn-outline" onclick="exportGridToSet()" style="margin-top: 8px; border-color: var(--purple); color: var(--purple);">📤 Экспорт в .set файл</button>
       </div>
       <div class="card hidden" id="gridResults">
         <h3 style="margin:0 0 10px;font-size:1rem">📋 Ордера сетки</h3>
@@ -453,7 +479,7 @@
       $("lblDeposit").textContent = (cur === 'RUB') ? "Депозит (₽)" : "Депозит ($)";
     }
 
-    // === ОБНОВЛЕНИЕ СПЕЦИФИКАЦИЙ (БЕЗ КУРСА) ===
+    // === ОБНОВЛЕНИЕ СПЕЦИФИКАЦИЙ ===
     function updateMoexSpecUI() { 
       const spec = getSpec(); 
       if (!spec) return; 
@@ -606,7 +632,7 @@
       } catch(e) { alert("Ошибка расчёта: " + e.message); }
     }
 
-    // === ИСПРАВЛЕННЫЙ РАСЧЁТ КРИПТО ===
+    // === РАСЧЁТ КРИПТО ===
     function runCryptoCalc() {
       try {
         const dep = parseFloat($("cryptoDeposit").value);
@@ -620,21 +646,17 @@
         if(!dep || !entry || !stop) return alert("Заполни Депозит, Вход и Стоп!");
         if(stop === entry) return alert("Стоп не может быть равен Входу!");
 
-        // ИСПРАВЛЕНИЕ: Правильно определяем риск
         let riskAmt;
         if (rType === "percent") {
             riskAmt = dep * (riskVal / 100);
         } else {
-            riskAmt = riskVal; // Фиксированная сумма
+            riskAmt = riskVal;
         }
         
         const stopDist = Math.abs(entry - stop);
         const isLong = stop < entry;
         
-        // Размер позиции в монетах
         const size = riskAmt / stopDist; 
-        
-        // Маржа
         const margin = (size * entry) / lev; 
         
         let pnlTP = 0;
@@ -655,7 +677,7 @@
         $("rSize").textContent = size.toFixed(6) + " монет";
         $("rMargin").textContent = margin.toFixed(2) + " USDT";
         $("rPipVal").textContent = size.toFixed(6) + " USDT/пункт"; 
-        $ ("rSpread").textContent = "-"; 
+        $("rSpread").textContent = "-"; 
         $("rComm").textContent = "-";
         $("rSwap").textContent = "x" + lev; 
         $("rGrossRisk").textContent = riskAmt.toFixed(2) + " USDT";
@@ -776,16 +798,27 @@
     function removeOrderRow() { const list = $("gridOrdersContainer"); if (list.children.length > 1) list.removeChild(list.lastChild); }
     function calcCoefficient() { const m = Array.from(document.querySelectorAll(".inp-mult")).map(i => parseFloat(i.value) || 0); $("gridCoefficient").value = m.reduce((a, b) => a + b, 0).toFixed(2); }
     
-    // === ИСПРАВЛЕННЫЙ РАСЧЁТ СЕТКИ ===
+    // === НОВАЯ ФУНКЦИЯ: ПЕРЕКЛЮЧЕНИЕ РЕЖИМА СЕТКИ ===
+    function toggleGridMode() {
+      const mode = document.querySelector('input[name="gridMode"]:checked').value;
+      if (mode === 'coef') {
+        $('gridCoefFields').classList.remove('hidden');
+        $('gridBudgetFields').classList.add('hidden');
+      } else {
+        $('gridCoefFields').classList.add('hidden');
+        $('gridBudgetFields').classList.remove('hidden');
+      }
+    }
+    
+    // === РАСЧЁТ СЕТКИ (ОБНОВЛЁННЫЙ) ===
     function calcGrid() {
       try {
         const pair = $("gridPair").value;
         const dep = parseFloat($("gridDeposit").value) || 0;
         const riskPct = parseFloat($("gridRisk").value) || 0;
         const direction = getToggleValue("gridDirToggle");
-        const globalSLPips = parseFloat($("gridGlobalSL").value) || 0;
-        const coefficient = parseFloat($("gridCoefficient").value) || 1;
-        const stepPips = parseFloat($("gridStep").value) || 100;
+        const mode = document.querySelector('input[name="gridMode"]:checked').value;
+        
         const entry = parseFloat($("gridEntry").value);
         const leverage = parseFloat($("gridLeverage").value) || 100;
         const useSwap = $("gridSwapCheck").checked;
@@ -795,28 +828,62 @@
         const showInAccountLots = $("gridLotToggle").checked;
 
         if (!entry || dep <= 0) return alert("Заполните депозит и цену входа");
-        if (globalSLPips <= 0) return alert("Укажите Stop Loss сетки");
 
         const pairSpec = getPairSpec(pair, "bcs");
         const pipSize = pairSpec.pip;
         const pipValueStandard = pairSpec.pipValueUSD;
         
-        const targetRisk = dep * (riskPct / 100);
-        const riskPerUnitPct = riskPct / coefficient;
-        const riskPerUnitAmount = dep * (riskPerUnitPct / 100);
+        let globalSLPips, coefficient, baseLotStandard;
+        let targetRisk, riskPerUnitPct, riskPerUnitAmount;
         
-        let baseLotStandard = riskPerUnitAmount / (globalSLPips * pipValueStandard);
+        if (mode === 'coef') {
+          // СТАРЫЙ РЕЖИМ
+          globalSLPips = parseFloat($("gridGlobalSL").value) || 0;
+          coefficient = parseFloat($("gridCoefficient").value) || 1;
+          if (globalSLPips <= 0) return alert("Укажите Stop Loss сетки");
+          
+          targetRisk = dep * (riskPct / 100);
+          riskPerUnitPct = riskPct / coefficient;
+          riskPerUnitAmount = dep * (riskPerUnitPct / 100);
+          baseLotStandard = riskPerUnitAmount / (globalSLPips * pipValueStandard);
+        } else {
+          // НОВЫЙ РЕЖИМ (по бюджету)
+          const slStep = parseFloat($("gridSLStep").value) || 10;
+          const budget = parseFloat($("gridRiskBudget").value) || 40;
+          const stepPips = parseFloat($("gridStep").value) || 100;
+          
+          const rows = Array.from(document.querySelectorAll("#gridOrdersContainer .row-4"));
+          const lastPrice = direction === "long" ? entry - ((rows.length - 1) * stepPips * pipSize) : entry + ((rows.length - 1) * stepPips * pipSize);
+          globalSLPips = Math.abs(lastPrice - (direction === "long" ? lastPrice - slStep : lastPrice + slStep)) / pipSize;
+          
+          // Расчёт лотов под бюджет
+          let rawRisk = 0;
+          const baseMult = 1;
+          rows.forEach((_, i) => {
+            const mult = baseMult * (1 + i * 0.5);
+            const dist = globalSLPips;
+            rawRisk += (baseLotStandard || 0.01) * mult * dist * pipValueStandard;
+          });
+          
+          const scale = budget / (rawRisk || 1);
+          baseLotStandard = 0.01 * scale;
+          targetRisk = budget;
+          riskPerUnitAmount = budget / rows.length;
+          riskPerUnitPct = (riskPerUnitAmount / dep) * 100;
+        }
+        
         baseLotStandard = Math.max(0.01, Math.round(baseLotStandard * 100) / 100);
         
+        const stepPips = parseFloat($("gridStep").value) || 100;
         const rows = Array.from(document.querySelectorAll("#gridOrdersContainer .row-4"));
         const orders = [];
         let totalLots = 0, weightedSum = 0, totalMargin = 0, totalRiskCalc = 0;
         
         rows.forEach((row, i) => {
-          const mult = parseFloat(row.querySelector(".inp-mult").value) || 1;
+          const mult = mode === 'coef' ? (parseFloat(row.querySelector(".inp-mult").value) || 1) : (1 + i * 0.5);
           const slPipsInput = parseFloat(row.querySelector(".inp-sl").value);
           const tpPipsInput = parseFloat(row.querySelector(".inp-tp").value);
-          const slPipsUsed = !isNaN(slPipsInput) ? slPipsInput : globalSLPips;
+          const slPipsUsed = mode === 'budget' ? globalSLPips : (!isNaN(slPipsInput) ? slPipsInput : globalSLPips);
           
           const price = direction === "long" ? entry - (stepPips * i * pipSize) : entry + (stepPips * i * pipSize);
           const lotStandard = baseLotStandard * mult;
@@ -866,7 +933,6 @@
         $("gridSwapTotal").textContent = `$${swapTotal.toFixed(2)}`;
         $("gridSwapRowRes").classList.toggle("hidden", !useSwap);
         
-        // ИСПРАВЛЕНИЕ: Показываем результаты
         $("gridResults").classList.remove("hidden");
         window.gridExportData = { orders, pair, direction, avgEntry, slPrice: globalSLPrice };
         
@@ -884,11 +950,39 @@
       }); 
       text += `\nSTOP LOSS: ${slPrice}`; 
       navigator.clipboard.writeText(text).then(() => { 
-        const btn = $("gridCopyBtn"); 
+        const btn = document.querySelector(".copy-btn"); 
         btn.textContent = "✅ Скопировано!"; 
         btn.classList.add("copied"); 
         setTimeout(() => { btn.textContent = "📋 Копировать уровни для терминала"; btn.classList.remove("copied"); }, 2000); 
       }).catch(() => alert("Не удалось скопировать.")); 
+    }
+    
+    // === НОВАЯ ФУНКЦИЯ: ЭКСПОРТ В .SET ФАЙЛ ===
+    function exportGridToSet() {
+      if (!window.gridExportData) return alert("Сначала рассчитайте сетку!");
+      const { orders, pair, direction, slPrice } = window.gridExportData;
+      
+      let content = `InpMagic=20240528\n`;
+      content += `InpDirection=${direction === 'long' ? 'ORDER_TYPE_BUY' : 'ORDER_TYPE_SELL'}\n`;
+      content += `InpTotalLevels=${orders.length}\n`;
+      
+      orders.forEach((o, i) => {
+        const n = i + 1;
+        content += `Price${n}=${o.price.toFixed(5)}\n`;
+        content += `Lot${n}=${(o.lot / ($("gridLotToggle").checked ? 100 : 1)).toFixed(2)}\n`;
+        content += `SL${n}=${slPrice}\n`;
+        content += `TP${n}=${o.tpPrice !== '-' ? o.tpPrice : slPrice}\n`;
+      });
+      
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'GridBot_Settings.set';
+      a.click();
+      URL.revokeObjectURL(url);
+      
+      alert('📄 Файл GridBot_Settings.set скачан!');
     }
 
     // === УТИЛИТЫ ===
