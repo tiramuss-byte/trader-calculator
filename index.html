@@ -836,30 +836,13 @@
           
           const margin = (price * lotStandard * 100000) / leverage;
           orders.push({ num: i+1, price, lot: lotDisplay, slPrice, tpPrice, margin });
-          // Общий объём = размер последнего ордера (итоговая позиция)
-          if (i === rows.length - 1) {
-          totalLots = lotDisplay;
-          }
+          totalLots += lotDisplay;
           weightedSum += lotStandard * price;
           totalMargin += margin;
         });
         
-        // Взвешенная средняя цена входа
-        let totalWeightedPrice = 0;
-        let totalLotSize = 0;
-        orders.forEach(o => {
-          const lotInStandard = o.lot / (showInAccountLots ? 100 : 1);
-          totalWeightedPrice += o.price * lotInStandard;
-          totalLotSize += lotInStandard;
-        });
-        const avgEntry = totalWeightedPrice / totalLotSize;
-        // Стоп-лосс сетки = стоп-лосс последнего ордера
-        const lastOrder = orders[orders.length - 1];
-        const lastOrderPrice = parseFloat(lastOrder.price);
-        const globalSLPrice = (direction === "long" 
-          ? (lastOrderPrice - (globalSLPips * pipSize)).toFixed(5)
-          : (lastOrderPrice + (globalSLPips * pipSize)).toFixed(5)
-        );
+        const avgEntry = weightedSum / (totalLots / (showInAccountLots ? 100 : 1));
+        const globalSLPrice = (direction === "long" ? entry - (globalSLPips * pipSize) : entry + (globalSLPips * pipSize)).toFixed(5);
         
         let swapTotal = 0;
         if (useSwap) {
@@ -918,7 +901,6 @@
       navigator.serviceWorker.register('./sw.js');
     });
   }
-</script>
-</script>
+  </script>
 </body>
 </html>
