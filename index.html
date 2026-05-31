@@ -68,7 +68,7 @@
         <button class="tab" onclick="switchTab('cb')">📈 Курс ЦБ РФ</button>
     </div>
 
-    <!-- MOEX - БЕЗ ИЗМЕНЕНИЙ -->
+    <!-- MOEX - ТОЧНО КАК В ТВОЁМ ФАЙЛЕ -->
     <div id="moex" class="tab-content active">
         <div class="row">
             <button class="btn btn-secondary" onclick="loadMOEXData()">📥 MOEX API</button>
@@ -105,7 +105,7 @@
         <div id="m-result" class="result-box hidden"></div>
     </div>
 
-    <!-- CRYPTO - БЕЗ ИЗМЕНЕНИЙ -->
+    <!-- CRYPTO - ТОЧНО КАК В ТВОЁМ ФАЙЛЕ -->
     <div id="crypto" class="tab-content">
         <div class="form-group"><label>Инструмент</label><select id="c-pair"><option>BTC/USDT</option><option>ETH/USDT</option><option>SOL/USDT</option></select></div>
         <div class="row">
@@ -135,7 +135,6 @@
         <div id="f-classic" class="tab-content active" style="padding: 0;">
             <div class="info-box" id="fx-info-msg">💡 Standard: 1 лот = 100 000 ед. | Пункт ≈ $1.00</div>
             
-            <!-- BROKER & ACCOUNT SETTINGS -->
             <div class="row">
                 <div class="form-group">
                     <label>Брокер</label>
@@ -210,7 +209,7 @@
                 <label for="fx-use-points">📏 Рассчитывать SL/TP в пунктах от цены входа</label>
             </div>
 
-            <!-- ПОЛЯ ДЛЯ ЦЕН (Скрыты если выбраны пункты) -->
+            <!-- ПОЛЯ ДЛЯ ЦЕН -->
             <div id="fx-price-inputs">
                 <div class="row">
                     <div class="form-group"><label>Стоп-лосс (Цена)</label><input type="number" id="fx-sl-price" step="0.00001"></div>
@@ -218,11 +217,11 @@
                 </div>
             </div>
 
-            <!-- ПОЛЯ ДЛЯ ПУНКТОВ (Скрыты по умолчанию) -->
+            <!-- ПОЛЯ ДЛЯ ПУНКТОВ (скрыты) -->
             <div id="fx-points-inputs" class="hidden">
                 <div class="row">
-                    <div class="form-group"><label>Расстояние до SL (пункты)</label><input type="number" id="fx-sl-points" placeholder="Например: 50"></div>
-                    <div class="form-group"><label>Расстояние до TP (пункты)</label><input type="number" id="fx-tp-points" placeholder="Например: 100"></div>
+                    <div class="form-group"><label>Расстояние до SL (пункты)</label><input type="number" id="fx-sl-points" placeholder="50"></div>
+                    <div class="form-group"><label>Расстояние до TP (пункты)</label><input type="number" id="fx-tp-points" placeholder="100"></div>
                 </div>
             </div>
 
@@ -289,9 +288,7 @@
                 <div class="form-group"><label>Шаг сетки (пипсы)</label><input type="number" id="g-step" value="10"></div>
             </div>
 
-            <div id="g-orders-list">
-                <!-- Orders will be added here -->
-            </div>
+            <div id="g-orders-list"></div>
             <button class="btn btn-secondary" onclick="addGridOrder()">➕ Добавить ордер</button>
 
             <div class="row" style="margin-top: 15px;">
@@ -299,8 +296,7 @@
                 <div class="form-group"><label>Своп Short ($)</label><input type="number" id="g-swap-s" value="0" step="0.01"></div>
             </div>
 
-            <button class="btn btn-primary" onclick="calcFxGrid()"> Рассчитать сетку</button>
-            <!-- НОВАЯ КНОПКА ЭКСПОРТА -->
+            <button class="btn btn-primary" onclick="calcFxGrid()">📊 Рассчитать сетку</button>
             <button class="btn btn-success" onclick="exportGridToSet()" style="margin-top: 5px;">📤 Экспорт в .set файл</button>
             
             <div id="g-result" class="result-box hidden"></div>
@@ -331,7 +327,7 @@
         event.target.classList.add('active');
     }
 
-    // --- FOREX CLASSIC LOGIC ---
+    // --- FOREX CLASSIC ---
     function toggleFxPointsInput() {
         const usePoints = document.getElementById('fx-use-points').checked;
         document.getElementById('fx-price-inputs').classList.toggle('hidden', usePoints);
@@ -339,11 +335,9 @@
     }
 
     function updateFxSettings() {
-        const pair = document.getElementById('fx-pair').value;
         const acc = document.getElementById('fx-acc-type').value;
         const info = document.getElementById('fx-info-msg');
         const gridInfo = document.getElementById('fx-grid-info');
-
         if (acc === 'cent') {
             info.innerHTML = '💡 ProCent: 1 лот = 1 000 ед. | Пункт ≈ $0.01';
             gridInfo.innerHTML = '💡 ProCent: 1 лот = 1 000 ед. | Пункт ≈ $0.01';
@@ -363,13 +357,10 @@
         const lever = parseFloat(document.getElementById('fx-lever').value);
         
         let sl, tp;
-        
-        // ЛОГИКА: ЦЕНА ИЛИ ПУНКТЫ
         if (document.getElementById('fx-use-points').checked) {
             const slPts = parseFloat(document.getElementById('fx-sl-points').value);
             const tpPts = parseFloat(document.getElementById('fx-tp-points').value);
             const ptVal = (pair.includes('JPY') || pair.includes('XAU') || pair.includes('XAG')) ? 0.01 : 0.0001;
-            
             if (dir === 'long') {
                 sl = entry - (slPts * ptVal);
                 tp = entry + (tpPts * ptVal);
@@ -383,12 +374,10 @@
         }
 
         if (!entry || !sl) return alert('Заполните Вход и SL!');
-
         const dist = Math.abs(entry - sl);
         const riskAmt = dep * (riskPct / 100);
         const contractSize = acc === 'cent' ? 1000 : 100000;
         const pointVal = (pair.includes('JPY') || pair.includes('XAU')) ? 0.01 : 0.00001;
-        
         const lot = riskAmt / (dist / pointVal); 
         const margin = (lot * contractSize * entry) / lever;
 
@@ -403,7 +392,7 @@
         `;
     }
 
-    // --- FOREX GRID LOGIC ---
+    // --- FOREX GRID ---
     function toggleGridMode() {
         const mode = document.querySelector('input[name="grid-mode"]:checked').value;
         document.getElementById('grid-coef-fields').classList.toggle('hidden', mode !== 'coef');
@@ -450,14 +439,11 @@
             const step = parseFloat(document.getElementById('g-sl-step').value);
             const budget = parseFloat(document.getElementById('g-budget').value);
             const lastPrice = prices[prices.length - 1];
-            
             gridSL = dir === 'buy' ? lastPrice - step : lastPrice + step;
-
             let rawRisk = 0;
             const dists = prices.map(p => Math.abs(p - gridSL));
             const baseLot = 0.01;
             dists.forEach(d => rawRisk += baseLot * d * 100); 
-
             const scale = budget / rawRisk;
             lots = dists.map(d => {
                 const l = (baseLot * scale);
@@ -470,18 +456,11 @@
         res.classList.remove('hidden');
         let html = `<table><tr><th>#</th><th>Цена</th><th>Лот</th><th>SL</th><th>TP</th></tr>`;
         prices.forEach((p, i) => {
-            html += `<tr>
-                <td>${i+1}</td>
-                <td>${p.toFixed(5)}</td>
-                <td>${lots[i].toFixed(2)}</td>
-                <td>${gridSL.toFixed(5)}</td>
-                <td>${tps[i] ? tps[i].toFixed(5) : '-'}</td>
-            </tr>`;
+            html += `<tr><td>${i+1}</td><td>${p.toFixed(5)}</td><td>${lots[i].toFixed(2)}</td><td>${gridSL.toFixed(5)}</td><td>${tps[i] ? tps[i].toFixed(5) : '-'}</td></tr>`;
         });
         html += `</table>`;
         html += `<div class="result-row" style="margin-top:10px"><span>Grid SL</span><span class="result-value">${gridSL.toFixed(5)}</span></div>`;
         if (mode === 'budget') html += `<div class="result-row"><span>Итоговый риск</span><span class="result-value">$${totalRisk.toFixed(2)}</span></div>`;
-        
         res.innerHTML = html;
         window.gridExportData = { prices, lots, tps, gridSL, dir };
     }
@@ -489,16 +468,10 @@
     function exportGridToSet() {
         if (!window.gridExportData) return alert('Сначала рассчитайте сетку!');
         const d = window.gridExportData;
-        let txt = `InpMagic=20240528\n`;
-        txt += `InpDirection=${d.dir === 'buy' ? 'ORDER_TYPE_BUY' : 'ORDER_TYPE_SELL'}\n`;
-        txt += `InpTotalLevels=${d.prices.length}\n`;
+        let txt = `InpMagic=20240528\nInpDirection=${d.dir === 'buy' ? 'ORDER_TYPE_BUY' : 'ORDER_TYPE_SELL'}\nInpTotalLevels=${d.prices.length}\n`;
         d.prices.forEach((p, i) => {
-            txt += `Price${i+1}=${p}\n`;
-            txt += `Lot${i+1}=${d.lots[i].toFixed(2)}\n`;
-            txt += `SL${i+1}=${d.gridSL}\n`;
-            txt += `TP${i+1}=${d.tps[i] || d.gridSL}\n`;
+            txt += `Price${i+1}=${p}\nLot${i+1}=${d.lots[i].toFixed(2)}\nSL${i+1}=${d.gridSL}\nTP${i+1}=${d.tps[i] || d.gridSL}\n`;
         });
-
         const blob = new Blob([txt], {type: "text/plain"});
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
@@ -506,7 +479,6 @@
         a.click();
     }
 
-    // --- INIT ---
     window.onload = function() {
         addGridOrder(); addGridOrder(); addGridOrder();
         updateFxSettings();
