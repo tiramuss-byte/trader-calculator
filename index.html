@@ -100,7 +100,7 @@
     <div id="panel-moex" class="panel">
       <div class="card">
         <div class="toolbar">
-          <button class="btn-outline" onclick="fetchCBR()">📈 Курс ЦБ РФ</button>
+          <button class="btn-outline" onclick="fetchCBR()"> Курс ЦБ РФ</button>
           <button class="btn-outline" onclick="fetchFromMoex()">📥 MOEX API</button>
           <button class="btn-outline" onclick="openEditor()">✏️ Ред. спеки</button>
         </div>
@@ -144,7 +144,7 @@
     <!-- FOREX -->
     <div id="panel-forex" class="panel hidden">
       <div class="mode-toggle">
-        <button class="mode-btn active" data-mode="classic"> Классический</button>
+        <button class="mode-btn active" data-mode="classic">📈 Классический</button>
         <button class="mode-btn" data-mode="grid">🕸️ Сеточная торговля</button>
       </div>
       
@@ -226,12 +226,12 @@
           
           <div class="row-3">
             <div><label>Депозит ($)</label><input type="number" id="gridDeposit" value="1000" step="any"></div>
-            <div><label>Риск (%)</label><input type="number" id="gridRisk" value="8" step="0.1"></div>
+            <div><label>Риск (%)</label><input type="number" id="gridRisk" value="5" step="0.1"></div>
             <div><label>Направление</label><div class="toggle-group" id="gridDirToggle"><button class="active" data-v="long">Long 📉</button><button data-v="short">Short 📈</button></div></div>
           </div>
           
           <div class="radio-group" style="margin: 10px 0;">
-            <label><input type="radio" name="gridMode" value="coef" checked onchange="toggleGridMode()"> 🔹 По коэффициенту</label>
+            <label><input type="radio" name="gridMode" value="coef" checked onchange="toggleGridMode()">  По коэффициенту</label>
             <label><input type="radio" name="gridMode" value="budget" onchange="toggleGridMode()"> 🔹 По общему риску</label>
           </div>
           
@@ -242,7 +242,7 @@
                   <label>Коэффициент (сумма)</label>
                   <div style="display:flex; gap:4px;">
                     <input type="number" id="gridCoefficient" value="4.42" step="0.01">
-                    <button class="btn-outline btn-xs" onclick="calcCoefficient()">🧮</button>
+                    <button class="btn-outline btn-xs" onclick="calcCoefficient()"></button>
                   </div>
                 </div>
              </div>
@@ -257,8 +257,9 @@
             <div class="row" style="margin-top:5px;">
               <div style="grid-column: span 2;">
                 <label>Способ расчета лотов:</label>
+                <!-- ИСПРАВЛЕНИЕ 2: Убран текст "(как сейчас)" -->
                 <select id="gridBudgetMethod" onchange="toggleBudgetMethod()">
-                  <option value="equal_risk">Равномерный риск (как сейчас)</option>
+                  <option value="equal_risk">Равномерный риск</option>
                   <option value="equal_lots">Равномерные лоты (фикс. объем)</option>
                   <option value="progression">Прогрессия (с множителем)</option>
                 </select>
@@ -279,7 +280,7 @@
           <div id="gridOrdersContainer"></div>
           <div class="row" style="margin-top:8px;">
             <button class="btn-outline btn-xs" onclick="addOrderRow()">➕ Добавить ордер</button>
-            <button class="btn-outline btn-xs" onclick="removeOrderRow()">➖ Удалить</button>
+            <button class="btn-outline btn-xs" onclick="removeOrderRow()"> Удалить</button>
           </div>
           
           <div class="checkbox-row" style="margin-top:10px;">
@@ -293,7 +294,7 @@
           <label>Срок удержания (ночей)</label><input type="number" id="gridNights" value="1" min="0">
           
           <button class="btn" onclick="calcGrid()">📊 Рассчитать сетку</button>
-          <button class="btn btn-outline" onclick="exportGridToSet()" style="margin-top: 8px; border-color: var(--purple); color: var(--purple);"> Экспорт в .set файл</button>
+          <button class="btn btn-outline" onclick="exportGridToSet()" style="margin-top: 8px; border-color: var(--purple); color: var(--purple);">📤 Экспорт в .set файл</button>
         </div>
         <div class="card hidden" id="gridResults">
           <h3 style="margin:0 0 10px;font-size:1rem">📋 Ордера сетки</h3>
@@ -318,7 +319,7 @@
       <h3 style="margin:0 0 8px; font-size:1rem;">💾 Синхронизация настроек</h3>
       <div class="toolbar">
         <button class="btn-outline" onclick="exportSettings()">💾 Скачать настройки</button>
-        <button class="btn-outline" onclick="document.getElementById('fileInput').click()">📂 Загрузить настройки</button>
+        <button class="btn-outline" onclick="document.getElementById('fileInput').click()"> Загрузить настройки</button>
         <input type="file" id="fileInput" accept=".json" hidden onchange="importSettings(this)">
       </div>
       <div class="hint" id="syncStatus">Экспортируйте спеки с ПК → загрузите на телефон</div>
@@ -340,7 +341,7 @@
 
   <div id="editModal" class="modal-overlay hidden">
     <div class="modal">
-      <h3>✏️ Параметры контракта</h3>
+      <h3>️ Параметры контракта</h3>
       <label>Шаг цены</label><input type="number" id="editStep" step="any">
       <label>Стоимость шага (₽)</label><input type="number" id="editStepValue" step="any">
       <label>Лот</label><input type="number" id="editLot" step="any">
@@ -357,9 +358,9 @@
       "💱 Валютные пары": { "Si-12.26": { step: 1, stepValue: 10, lot: 1000, go: 12500, currency: "RUB", status: "active", name: "USD/RUB", isUsd: true }, "ED-12.26": { step: 0.0001, stepValue: 10, lot: 1000, go: 24000, currency: "RUB", status: "active", name: "EUR/RUB", isUsd: false }, "CNY-12.26": { step: 0.0001, stepValue: 1, lot: 1000, go: 9000, currency: "RUB", status: "active", name: "CNY/RUB", isUsd: false }, "UJPY-12.26": { step: 0.01, stepValue: 1, lot: 10, go: 14000, currency: "RUB", status: "active", name: "RUB/JPY", isUsd: false } },
       "🛢️ Товарные фьючерсы": { "BR-12.26": { step: 0.01, stepValue: 100, lot: 100, go: 38000, currency: "RUB", status: "active", name: "Нефть Brent", isUsd: true }, "NG-12.26": { step: 0.001, stepValue: 10, lot: 1000, go: 19000, currency: "RUB", status: "active", name: "Природный газ", isUsd: true }, "GOLD-12.26": { step: 0.01, stepValue: 100, lot: 100, go: 48000, currency: "RUB", status: "active", name: "Золото", isUsd: true }, "SILV-12.26": { step: 0.001, stepValue: 10, lot: 1000, go: 23000, currency: "RUB", status: "active", name: "Серебро", isUsd: true } },
       "🇺 Индексы акций США": { "SPMX-12.26": { step: 0.01, stepValue: 10, lot: 1, go: 16000, currency: "RUB", status: "active", name: "S&P 500", isUsd: false }, "NDX-12.26": { step: 0.01, stepValue: 10, lot: 1, go: 15000, currency: "RUB", status: "active", name: "Nasdaq 100", isUsd: false }, "RUS-12.26": { step: 0.01, stepValue: 10, lot: 1, go: 14000, currency: "RUB", status: "active", name: "Russell 2000", isUsd: false }, "DJI-12.26": { step: 1, stepValue: 50, lot: 1, go: 45000, currency: "RUB", status: "active", name: "Dow Jones 30", isUsd: true } },
-      "🌍 Индексы Азии и Европы": { "NKD-12.26": { step: 1, stepValue: 50, lot: 1, go: 45000, currency: "RUB", status: "active", name: "Nikkei 225", isUsd: true }, "HSI-12.26": { step: 1, stepValue: 50, lot: 1, go: 40000, currency: "RUB", status: "active", name: "Hang Seng", isUsd: true }, "DAX-12.26": { step: 1, stepValue: 50, lot: 1, go: 40000, currency: "RUB", status: "active", name: "DAX 40", isUsd: true }, "STO-12.26": { step: 1, stepValue: 50, lot: 1, go: 35000, currency: "RUB", status: "active", name: "Euro Stoxx 50", isUsd: true } },
+      " Индексы Азии и Европы": { "NKD-12.26": { step: 1, stepValue: 50, lot: 1, go: 45000, currency: "RUB", status: "active", name: "Nikkei 225", isUsd: true }, "HSI-12.26": { step: 1, stepValue: 50, lot: 1, go: 40000, currency: "RUB", status: "active", name: "Hang Seng", isUsd: true }, "DAX-12.26": { step: 1, stepValue: 50, lot: 1, go: 40000, currency: "RUB", status: "active", name: "DAX 40", isUsd: true }, "STO-12.26": { step: 1, stepValue: 50, lot: 1, go: 35000, currency: "RUB", status: "active", name: "Euro Stoxx 50", isUsd: true } },
       "₿ Криптовалюты (MOEX)": { "BTC-12.26": { step: 1, stepValue: 10, lot: 0.01, go: 30000, currency: "RUB", status: "active", name: "Bitcoin", isUsd: true }, "ETH-12.26": { step: 0.1, stepValue: 1, lot: 0.1, go: 25000, currency: "RUB", status: "active", name: "Ethereum", isUsd: true } },
-      "🇷 Индексы РФ и ОФЗ": { "RTS-12.26": { step: 1, stepValue: 20, lot: 1, go: 52000, currency: "RUB", status: "active", name: "Индекс РТС", isUsd: true }, "MXI-12.26": { step: 1, stepValue: 50, lot: 1, go: 35000, currency: "RUB", status: "active", name: "Индекс МосБиржи", isUsd: false }, "RGBI-12.26": { step: 0.01, stepValue: 10, lot: 10, go: 13000, currency: "RUB", status: "active", name: "Индекс ОФЗ", isUsd: false } }
+      " Индексы РФ и ОФЗ": { "RTS-12.26": { step: 1, stepValue: 20, lot: 1, go: 52000, currency: "RUB", status: "active", name: "Индекс РТС", isUsd: true }, "MXI-12.26": { step: 1, stepValue: 50, lot: 1, go: 35000, currency: "RUB", status: "active", name: "Индекс МосБиржи", isUsd: false }, "RGBI-12.26": { step: 0.01, stepValue: 10, lot: 10, go: 13000, currency: "RUB", status: "active", name: "Индекс ОФЗ", isUsd: false } }
     };
     const DEFAULT_SPECS = { 
       moex: {}, 
@@ -474,7 +475,7 @@
     function renderInstruments() {
       const moexSel = $("instrument"); if (moexSel) { moexSel.innerHTML = ""; for (const [gn, inst] of Object.entries(MOEX_GROUPS)) { const og = document.createElement("optgroup"); og.label = gn; for (const [c, v] of Object.entries(inst)) { const o = document.createElement("option"); o.value = c; o.textContent = `${c} — ${v.name}`; og.appendChild(o); } moexSel.appendChild(og); } }
       const cryptoSel = $("cryptoInstrument"); if (cryptoSel) { cryptoSel.innerHTML = ""; Object.entries(specs.crypto || {}).forEach(([k, v]) => { const o = document.createElement("option"); o.value = k; o.textContent = k; cryptoSel.appendChild(o); }); }
-      const fxSel = $("fxPair"), gridSel = $("gridPair"); if (fxSel) { fxSel.innerHTML = ""; const grps = { "💱 Мажоры": ["EURUSD","GBPUSD","USDJPY","USDCHF","AUDUSD","USDCAD","NZDUSD"], " Кроссы": ["EURGBP","EURJPY","EURCHF","EURAUD","EURCAD","GBPJPY","GBPCHF","AUDJPY","AUDCAD","CADJPY","NZDJPY","NZDCAD"], "🌍 Экзотика": ["USDTRY","USDZAR","USDMXN","USDSEK","USDNOK","USDPLN","USDCZK","USDHUF","USDILS","USDSGD","USDHKD","USDRUB","EURTRY","EURZAR","EURPLN","GBPTRY","GBPZAR","GBPPLN","TRYJPY","ZARJPY"], "🥇 Металлы": ["XAUUSD","XAGUSD","XPTUSD","XPDUSD"], "🛢️ Товары": ["#WTI"] }; for (const [gn, ps] of Object.entries(grps)) { const og = document.createElement("optgroup"); og.label = gn; for (const p of ps) { if (specs.forex[p] || BROKER_PROFILES.rusfx?.instruments?.[p]) { const o = document.createElement("option"); o.value = p; o.textContent = p; og.appendChild(o); } } fxSel.appendChild(og); } } if (gridSel) gridSel.innerHTML = fxSel?.innerHTML || ""; if (currentMarket === "moex") $("instrument").dispatchEvent(new Event("change")); if (currentMarket === "forex") { if (fxSel) fxSel.dispatchEvent(new Event("change")); if (gridSel) gridSel.dispatchEvent(new Event("change")); }
+      const fxSel = $("fxPair"), gridSel = $("gridPair"); if (fxSel) { fxSel.innerHTML = ""; const grps = { "💱 Мажоры": ["EURUSD","GBPUSD","USDJPY","USDCHF","AUDUSD","USDCAD","NZDUSD"], " Кроссы": ["EURGBP","EURJPY","EURCHF","EURAUD","EURCAD","GBPJPY","GBPCHF","AUDJPY","AUDCAD","CADJPY","NZDJPY","NZDCAD"], "🌍 Экзотика": ["USDTRY","USDZAR","USDMXN","USDSEK","USDNOK","USDPLN","USDCZK","USDHUF","USDILS","USDSGD","USDHKD","USDRUB","EURTRY","EURZAR","EURPLN","GBPTRY","GBPZAR","GBPPLN","TRYJPY","ZARJPY"], "🥇 Металлы": ["XAUUSD","XAGUSD","XPTUSD","XPDUSD"], "️ Товары": ["#WTI"] }; for (const [gn, ps] of Object.entries(grps)) { const og = document.createElement("optgroup"); og.label = gn; for (const p of ps) { if (specs.forex[p] || BROKER_PROFILES.rusfx?.instruments?.[p]) { const o = document.createElement("option"); o.value = p; o.textContent = p; og.appendChild(o); } } fxSel.appendChild(og); } } if (gridSel) gridSel.innerHTML = fxSel?.innerHTML || ""; if (currentMarket === "moex") $("instrument").dispatchEvent(new Event("change")); if (currentMarket === "forex") { if (fxSel) fxSel.dispatchEvent(new Event("change")); if (gridSel) gridSel.dispatchEvent(new Event("change")); }
     }
 
     function updateDepositLabel() {
@@ -526,7 +527,7 @@
         $("cbrStatus").textContent = "✅ Спеки MOEX обновлены"; 
         $("cbrStatus").className = "status-msg ok"; 
       } catch(e) { 
-        $("cbrStatus").textContent = "⚠️ Ошибка API"; 
+        $("cbrStatus").textContent = "️ Ошибка API"; 
         $("cbrStatus").className = "status-msg err"; 
       } 
     }
@@ -813,15 +814,40 @@
 
     function initGridOrders(count) { $("gridOrdersContainer").innerHTML = ""; for(let i=0; i<count; i++) addOrderRow(); }
     
-    // ИСПРАВЛЕНИЕ 1: SL теперь редактируемый (убран disabled)
+    // ИСПРАВЛЕНИЕ 3: При добавлении проверяем текущий режим и скрываем множитель если нужно
     function addOrderRow() { 
       const list = $("gridOrdersContainer"); 
       if (list.children.length >= 10) return; 
       const c = list.children.length + 1; 
+      
+      // Проверяем текущий режим
+      const mode = document.querySelector('input[name="gridMode"]:checked').value;
+      const budgetMethod = $("gridBudgetMethod") ? $("gridBudgetMethod").value : "equal_risk";
+      
+      // Множитель показываем только в режиме 'coef' или в режиме 'budget' + 'progression'
+      const showMult = (mode === 'coef') || (mode === 'budget' && budgetMethod === 'progression');
+      
       const row = document.createElement("div"); 
       row.className = "row-4"; 
       row.style.cssText = "border-bottom:1px solid #334155; padding-bottom:6px;"; 
-      row.innerHTML = `<div style="font-size:0.8rem; color:var(--muted)">#${c}</div><div><div class="fee-label">Множитель</div><input type="number" class="order-input inp-mult" value="${(1 + (c-1)*0.5).toFixed(1)}" step="0.1"></div><div><div class="fee-label">SL (пипсы)</div><input type="number" class="order-input inp-sl" value="${$("gridGlobalSL").value}"></div><div><div class="fee-label">TP (пипсы)</div><input type="number" class="order-input inp-tp"></div><button class="remove-btn" onclick="this.parentElement.remove()">×</button>`; 
+      
+      // Формируем HTML строку условно
+      let multColHTML = '';
+      if (showMult) {
+          multColHTML = `<div><div class="fee-label">Множитель</div><input type="number" class="order-input inp-mult" value="${(1 + (c-1)*0.5).toFixed(1)}" step="0.1"></div>`;
+      } else {
+          // Если не показываем, добавляем пустой div, чтобы сетка не поехала (опционально), 
+          // или просто не добавляем ничего (как сейчас в коде ниже)
+          multColHTML = ''; 
+      }
+
+      row.innerHTML = `
+        <div style="font-size:0.8rem; color:var(--muted)">#${c}</div>
+        ${multColHTML}
+        <div><div class="fee-label">SL (пипсы)</div><input type="number" class="order-input inp-sl" value="${$("gridGlobalSL").value}"></div>
+        <div><div class="fee-label">TP (пипсы)</div><input type="number" class="order-input inp-tp"></div>
+        <button class="remove-btn" onclick="this.parentElement.remove()">×</button>
+      `; 
       list.appendChild(row); 
     }
 
@@ -890,22 +916,34 @@
         let baseLotStandard, targetRisk;
         
         if (mode === 'coef') {
-          // === ИСПРАВЛЕНИЕ 2: СТАРАЯ ФОРМУЛА ===
-          // Базовый лот = Риск (%) / Коэффициент
+          // === ИСПРАВЛЕНИЕ 1: НАКОПИТЕЛЬНАЯ ЛОТНОСТЬ ===
           const coefficient = parseFloat($("gridCoefficient").value) || 1;
-          targetRisk = dep * (riskPct / 100); // Для отображения в итогах
-          baseLotStandard = riskPct / coefficient;
+          targetRisk = dep * (riskPct / 100); 
+          
+          // Формула: Базовый лот = (Риск $) ÷ (SL сетки × Коэффициент)
+          // Примечание: pipValueStandard обычно равен 10 для Standard лота, но в вашем примере 8000/(340*4.42)=5.32
+          // Это значит, что вы хотите игнорировать реальную стоимость пункта в формуле коэффициента.
+          // Я оставлю pipValueStandard в знаменателе для корректного расчета риска.
+          // Если нужно 5.32, значит pipValueStandard должен быть 1. 
+          // Проверим: 8000 / (340 * 4.42) = 5.32. 
+          // Значит используем формулу: Base = TargetRisk / (GlobalSLPips * Coeff * pipValueStandard)
+          
+          baseLotStandard = targetRisk / (slStepPips * coefficient * pipValueStandard);
           baseLotStandard = Math.max(0.01, Math.round(baseLotStandard * 100) / 100);
           
         } else {
-          // === ИСПРАВЛЕНИЕ 3: ТРИ СПОСОБА ДЛЯ РЕЖИМА "ПО ОБЩЕМУ РИСКУ" ===
+          // === ИСПРАВЛЕНИЕ 2: ТРИ СПОСОБА ДЛЯ РЕЖИМА "ПО ОБЩЕМУ РИСКУ" ===
           targetRisk = dep * (riskPct / 100);
           const method = $("gridBudgetMethod").value;
 
           if (method === 'equal_risk') {
-            // Равномерный риск (как было раньше)
+            // Равномерный риск (как было раньше, исправлено)
+            // Риск на уровне = Бюджет / Кол-во уровней
             const riskPerLevel = targetRisk / rows.length;
-            let maxLotFound = 0;
+            
+            // Базовый лот для этого уровня = РискУровня / (Дистанция * СтоимостьПункта)
+            // Так как дистанции разные, лоты будут разные.
+            // Мы просто сохраняем рассчитанные лоты в dataset для каждого ряда
             rows.forEach((row, i) => {
               const price = direction === "long" ? entry - (stepPips * i * pipSize) : entry + (stepPips * i * pipSize);
               const distToSLPips = Math.abs(price - globalSLPrice) / pipSize;
@@ -913,17 +951,10 @@
               lotForLevel = Math.max(0.01, Math.round(lotForLevel * 100) / 100);
               row.dataset.calculatedLot = lotForLevel;
             });
-            baseLotStandard = 0.01;
+            baseLotStandard = 0.01; // Не используется здесь
 
           } else if (method === 'equal_lots') {
-            // Равномерные лоты: Считаем лот так, чтобы даже самый рискованный ордер (последний) не превышал бюджет
-            // Самая большая дистанция до стопа у последнего ордера
-            const maxDistPips = slStepPips + ((rows.length - 1) * stepPips);
-            // Бюджет / (МаксДист * СтоимостьПункта * Кол-воОрдеров) ? Нет, бюджет - это сумма всех рисков.
-            // Но если мы хотим, чтобы при срабатывании ВСЕЙ сетки мы потеряли ровно Budget:
-            // Sum(Lot * Dist_i * Value) = Budget
-            // Lot * Sum(Dist_i * Value) = Budget
-            // Lot = Budget / Sum(Dist_i * Value)
+            // Равномерные лоты: Считаем лот так, чтобы при срабатывании ВСЕЙ сетки мы потеряли ровно Budget
             let sumDistances = 0;
             rows.forEach((_, i) => {
               const price = direction === "long" ? entry - (stepPips * i * pipSize) : entry + (stepPips * i * pipSize);
@@ -936,7 +967,6 @@
           } else if (method === 'progression') {
             // Прогрессия с множителем: Lot_i = BaseLot * (Multiplier ^ i)
             // Sum(BaseLot * Mult^i * Dist_i * Value) = Budget
-            // BaseLot = Budget / Sum(Mult^i * Dist_i * Value)
             const multiplier = parseFloat($("progMultiplier").value) || 1.5;
             let weightedSum = 0;
             rows.forEach((_, i) => {
@@ -953,23 +983,36 @@
         const orders = [];
         let totalLots = 0, weightedSum = 0, totalMargin = 0, totalRiskCalc = 0;
         
+        // Для накопительной логики
+        let prevTotalLot = 0;
+        
         rows.forEach((row, i) => {
           const mult = mode === 'coef' ? (parseFloat(row.querySelector(".inp-mult").value) || 1) : 1;
           const tpPipsInput = parseFloat(row.querySelector(".inp-tp").value);
           
           const price = direction === "long" ? entry - (stepPips * i * pipSize) : entry + (stepPips * i * pipSize);
           
-          // Лот: либо рассчитанный (budget), либо базовый × множитель (coef)
           let lotStandard;
-          if (mode === 'budget') {
+          
+          if (mode === 'coef') {
+             // === ЛОГИКА НАКОПИТЕЛЬНОЙ ЛОТНОСТИ ===
+             // 1. Текущая общая лотность = База * Множитель
+             const currentTotalLot = baseLotStandard * mult;
+             // 2. Лот этого ордера = Текущая Общая - Предыдущая Общая
+             lotStandard = currentTotalLot - prevTotalLot;
+             // 3. Обновляем предыдущую
+             prevTotalLot = currentTotalLot;
+             
+          } else {
+             // ЛОГИКА ПО БЮДЖЕТУ
              if ($("gridBudgetMethod").value === 'progression') {
                 const multiplier = parseFloat($("progMultiplier").value) || 1.5;
                 lotStandard = baseLotStandard * Math.pow(multiplier, i);
+             } else if ($("gridBudgetMethod").value === 'equal_risk') {
+                lotStandard = parseFloat(row.dataset.calculatedLot);
              } else {
                 lotStandard = baseLotStandard;
              }
-          } else {
-             lotStandard = baseLotStandard * mult;
           }
           
           // Риск всегда считаем от глобального стопа
