@@ -144,7 +144,7 @@
     <!-- FOREX -->
     <div id="panel-forex" class="panel hidden">
       <div class="mode-toggle">
-        <button class="mode-btn active" data-mode="classic">📈 Классический</button>
+        <button class="mode-btn active" data-mode="classic"> Классический</button>
         <button class="mode-btn" data-mode="grid">🕸️ Сеточная торговля</button>
       </div>
       
@@ -208,7 +208,7 @@
               <div><div class="fee-label">Спред (пипсы)</div><input type="number" id="fxSpread" step="0.1" value="0"></div>
               <div><div class="fee-label">Комиссия ($/лот)</div><input type="number" id="fxComm" step="0.1" value="0"></div>
               <div class="fee-actions">
-                <button class="btn-outline btn-xs" onclick="alert('Спеки подтягиваются автоматически')"></button>
+                <button class="btn-outline btn-xs" onclick="alert('Спеки подтягиваются автоматически')">📥</button>
                 <button class="btn-outline btn-xs" onclick="resetFxFees()">🔄</button>
               </div>
             </div>
@@ -237,7 +237,7 @@
           
           <div id="gridCoefFields">
              <div class="row">
-                <div><label>Стоп-лосс сетки (пипсы)</label><input type="number" id="gridGlobalSL" value="340" step="1"></div>
+                <div><label>Стоп-лосс сетки (пипсы)</label><input type="number" id="gridGlobalSL" value="500" step="1"></div>
                 <div>
                   <label>Коэффициент (сумма)</label>
                   <div style="display:flex; gap:4px;">
@@ -246,14 +246,28 @@
                   </div>
                 </div>
              </div>
-             <div class="hint">Риск на «единицу» = Общий риск% ÷ Коэффициент</div>
+             <div class="hint">Базовый лот = Риск % ÷ Коэффициент</div>
           </div>
           
+          <!-- Новое: Выбор метода для режима "По общему риску" -->
           <div id="gridBudgetFields" class="hidden">
             <div class="row">
               <div><label>Шаг стопа от посл. уровня (пипсы)</label><input type="number" id="gridSLStepPips" value="340" step="1"></div>
             </div>
-            <div class="hint">Калькулятор автоматически подберёт лоты под бюджет.</div>
+            <div class="row" style="margin-top:5px;">
+              <div style="grid-column: span 2;">
+                <label>Способ расчета лотов:</label>
+                <select id="gridBudgetMethod" onchange="toggleBudgetMethod()">
+                  <option value="equal_risk">Равномерный риск (как сейчас)</option>
+                  <option value="equal_lots">Равномерные лоты (фикс. объем)</option>
+                  <option value="progression">Прогрессия (с множителем)</option>
+                </select>
+              </div>
+            </div>
+            <div id="progMultContainer" class="hidden">
+               <label>Множитель прогрессии:</label><input type="number" id="progMultiplier" value="1.5" step="0.1">
+            </div>
+            <div class="hint" id="budgetHint">Калькулятор автоматически подберёт лоты под бюджет.</div>
           </div>
           
           <div class="row-3">
@@ -279,7 +293,7 @@
           <label>Срок удержания (ночей)</label><input type="number" id="gridNights" value="1" min="0">
           
           <button class="btn" onclick="calcGrid()">📊 Рассчитать сетку</button>
-          <button class="btn btn-outline" onclick="exportGridToSet()" style="margin-top: 8px; border-color: var(--purple); color: var(--purple);">📤 Экспорт в .set файл</button>
+          <button class="btn btn-outline" onclick="exportGridToSet()" style="margin-top: 8px; border-color: var(--purple); color: var(--purple);"> Экспорт в .set файл</button>
         </div>
         <div class="card hidden" id="gridResults">
           <h3 style="margin:0 0 10px;font-size:1rem">📋 Ордера сетки</h3>
@@ -460,7 +474,7 @@
     function renderInstruments() {
       const moexSel = $("instrument"); if (moexSel) { moexSel.innerHTML = ""; for (const [gn, inst] of Object.entries(MOEX_GROUPS)) { const og = document.createElement("optgroup"); og.label = gn; for (const [c, v] of Object.entries(inst)) { const o = document.createElement("option"); o.value = c; o.textContent = `${c} — ${v.name}`; og.appendChild(o); } moexSel.appendChild(og); } }
       const cryptoSel = $("cryptoInstrument"); if (cryptoSel) { cryptoSel.innerHTML = ""; Object.entries(specs.crypto || {}).forEach(([k, v]) => { const o = document.createElement("option"); o.value = k; o.textContent = k; cryptoSel.appendChild(o); }); }
-      const fxSel = $("fxPair"), gridSel = $("gridPair"); if (fxSel) { fxSel.innerHTML = ""; const grps = { "💱 Мажоры": ["EURUSD","GBPUSD","USDJPY","USDCHF","AUDUSD","USDCAD","NZDUSD"], "💱 Кроссы": ["EURGBP","EURJPY","EURCHF","EURAUD","EURCAD","GBPJPY","GBPCHF","AUDJPY","AUDCAD","CADJPY","NZDJPY","NZDCAD"], " Экзотика": ["USDTRY","USDZAR","USDMXN","USDSEK","USDNOK","USDPLN","USDCZK","USDHUF","USDILS","USDSGD","USDHKD","USDRUB","EURTRY","EURZAR","EURPLN","GBPTRY","GBPZAR","GBPPLN","TRYJPY","ZARJPY"], "🥇 Металлы": ["XAUUSD","XAGUSD","XPTUSD","XPDUSD"], "🛢️ Товары": ["#WTI"] }; for (const [gn, ps] of Object.entries(grps)) { const og = document.createElement("optgroup"); og.label = gn; for (const p of ps) { if (specs.forex[p] || BROKER_PROFILES.rusfx?.instruments?.[p]) { const o = document.createElement("option"); o.value = p; o.textContent = p; og.appendChild(o); } } fxSel.appendChild(og); } } if (gridSel) gridSel.innerHTML = fxSel?.innerHTML || ""; if (currentMarket === "moex") $("instrument").dispatchEvent(new Event("change")); if (currentMarket === "forex") { if (fxSel) fxSel.dispatchEvent(new Event("change")); if (gridSel) gridSel.dispatchEvent(new Event("change")); }
+      const fxSel = $("fxPair"), gridSel = $("gridPair"); if (fxSel) { fxSel.innerHTML = ""; const grps = { "💱 Мажоры": ["EURUSD","GBPUSD","USDJPY","USDCHF","AUDUSD","USDCAD","NZDUSD"], " Кроссы": ["EURGBP","EURJPY","EURCHF","EURAUD","EURCAD","GBPJPY","GBPCHF","AUDJPY","AUDCAD","CADJPY","NZDJPY","NZDCAD"], "🌍 Экзотика": ["USDTRY","USDZAR","USDMXN","USDSEK","USDNOK","USDPLN","USDCZK","USDHUF","USDILS","USDSGD","USDHKD","USDRUB","EURTRY","EURZAR","EURPLN","GBPTRY","GBPZAR","GBPPLN","TRYJPY","ZARJPY"], "🥇 Металлы": ["XAUUSD","XAGUSD","XPTUSD","XPDUSD"], "🛢️ Товары": ["#WTI"] }; for (const [gn, ps] of Object.entries(grps)) { const og = document.createElement("optgroup"); og.label = gn; for (const p of ps) { if (specs.forex[p] || BROKER_PROFILES.rusfx?.instruments?.[p]) { const o = document.createElement("option"); o.value = p; o.textContent = p; og.appendChild(o); } } fxSel.appendChild(og); } } if (gridSel) gridSel.innerHTML = fxSel?.innerHTML || ""; if (currentMarket === "moex") $("instrument").dispatchEvent(new Event("change")); if (currentMarket === "forex") { if (fxSel) fxSel.dispatchEvent(new Event("change")); if (gridSel) gridSel.dispatchEvent(new Event("change")); }
     }
 
     function updateDepositLabel() {
@@ -490,7 +504,7 @@
         $("cbrStatus").textContent = `✅ Курс USD/RUB ЦБ: ${cbrRate.toFixed(2)} ₽`; 
         $("cbrStatus").className = "status-msg ok"; 
       } catch(e) { 
-        $("cbrStatus").textContent = "️ Ошибка загрузки"; 
+        $("cbrStatus").textContent = "⚠️ Ошибка загрузки"; 
         $("cbrStatus").className = "status-msg err"; 
       } 
     }
@@ -512,7 +526,7 @@
         $("cbrStatus").textContent = "✅ Спеки MOEX обновлены"; 
         $("cbrStatus").className = "status-msg ok"; 
       } catch(e) { 
-        $("cbrStatus").textContent = "️ Ошибка API"; 
+        $("cbrStatus").textContent = "⚠️ Ошибка API"; 
         $("cbrStatus").className = "status-msg err"; 
       } 
     }
@@ -798,7 +812,19 @@
     }
 
     function initGridOrders(count) { $("gridOrdersContainer").innerHTML = ""; for(let i=0; i<count; i++) addOrderRow(); }
-    function addOrderRow() { const list = $("gridOrdersContainer"); if (list.children.length >= 10) return; const c = list.children.length + 1; const row = document.createElement("div"); row.className = "row-4"; row.style.cssText = "border-bottom:1px solid #334155; padding-bottom:6px;"; row.innerHTML = `<div style="font-size:0.8rem; color:var(--muted)">#${c}</div><div><div class="fee-label">Множитель</div><input type="number" class="order-input inp-mult" value="${(1 + (c-1)*0.5).toFixed(1)}" step="0.1"></div><div><div class="fee-label">SL (пипсы)</div><input type="number" class="order-input inp-sl" value="${$("gridGlobalSL").value}" disabled></div><div><div class="fee-label">TP (пипсы)</div><input type="number" class="order-input inp-tp"></div><button class="remove-btn" onclick="this.parentElement.remove()">×</button>`; list.appendChild(row); }
+    
+    // ИСПРАВЛЕНИЕ 1: SL теперь редактируемый (убран disabled)
+    function addOrderRow() { 
+      const list = $("gridOrdersContainer"); 
+      if (list.children.length >= 10) return; 
+      const c = list.children.length + 1; 
+      const row = document.createElement("div"); 
+      row.className = "row-4"; 
+      row.style.cssText = "border-bottom:1px solid #334155; padding-bottom:6px;"; 
+      row.innerHTML = `<div style="font-size:0.8rem; color:var(--muted)">#${c}</div><div><div class="fee-label">Множитель</div><input type="number" class="order-input inp-mult" value="${(1 + (c-1)*0.5).toFixed(1)}" step="0.1"></div><div><div class="fee-label">SL (пипсы)</div><input type="number" class="order-input inp-sl" value="${$("gridGlobalSL").value}"></div><div><div class="fee-label">TP (пипсы)</div><input type="number" class="order-input inp-tp"></div><button class="remove-btn" onclick="this.parentElement.remove()">×</button>`; 
+      list.appendChild(row); 
+    }
+
     function removeOrderRow() { const list = $("gridOrdersContainer"); if (list.children.length > 1) list.removeChild(list.lastChild); }
     function calcCoefficient() { const m = Array.from(document.querySelectorAll(".inp-mult")).map(i => parseFloat(i.value) || 0); $("gridCoefficient").value = m.reduce((a, b) => a + b, 0).toFixed(2); }
     
@@ -814,6 +840,15 @@
         document.querySelectorAll('.inp-mult').forEach(i => i.parentElement.classList.add('hidden'));
       }
     }
+
+    function toggleBudgetMethod() {
+      const method = $("gridBudgetMethod").value;
+      if (method === 'progression') {
+        $('progMultContainer').classList.remove('hidden');
+      } else {
+        $('progMultContainer').classList.add('hidden');
+      }
+    }
     
     function formatPrice(pair, price) {
         if (!price) return "";
@@ -822,7 +857,7 @@
         return parseFloat(price).toFixed(5);
     }
 
-    // === РАСЧЁТ СЕТКИ (ФИНАЛЬНО ИСПРАВЛЕННЫЙ) ===
+    // === РАСЧЁТ СЕТКИ (ПОЛНОСТЬЮ ПЕРЕРАБОТАННЫЙ) ===
     function calcGrid() {
       try {
         const pair = $("gridPair").value;
@@ -855,36 +890,64 @@
         let baseLotStandard, targetRisk;
         
         if (mode === 'coef') {
-          // === ИСПРАВЛЕННЫЙ РАСЧЁТ ПО КОЭФФИЦИЕНТУ ===
+          // === ИСПРАВЛЕНИЕ 2: СТАРАЯ ФОРМУЛА ===
+          // Базовый лот = Риск (%) / Коэффициент
           const coefficient = parseFloat($("gridCoefficient").value) || 1;
-          targetRisk = dep * (riskPct / 100);
-          
-          // Считаем взвешенную сумму дистанций до глобального стопа
-          let weightedDistSum = 0;
-          rows.forEach((row, i) => {
-            const price = direction === "long" ? entry - (stepPips * i * pipSize) : entry + (stepPips * i * pipSize);
-            const distToSL = Math.abs(price - globalSLPrice) / pipSize;
-            const mult = parseFloat(row.querySelector(".inp-mult").value) || 1;
-            weightedDistSum += mult * distToSL;
-          });
-          
-          // Базовый лот = Целевой риск / (Стоимость пункта × Взвешенная сумма дистанций)
-          baseLotStandard = targetRisk / (pipValueStandard * weightedDistSum);
+          targetRisk = dep * (riskPct / 100); // Для отображения в итогах
+          baseLotStandard = riskPct / coefficient;
           baseLotStandard = Math.max(0.01, Math.round(baseLotStandard * 100) / 100);
           
         } else {
-          // === РЕЖИМ ПО БЮДЖЕТУ ===
+          // === ИСПРАВЛЕНИЕ 3: ТРИ СПОСОБА ДЛЯ РЕЖИМА "ПО ОБЩЕМУ РИСКУ" ===
           targetRisk = dep * (riskPct / 100);
-          const riskPerLevel = targetRisk / rows.length;
+          const method = $("gridBudgetMethod").value;
 
-          rows.forEach((row, i) => {
-            const price = direction === "long" ? entry - (stepPips * i * pipSize) : entry + (stepPips * i * pipSize);
-            const distToSLPips = Math.abs(price - globalSLPrice) / pipSize;
-            let lotForLevel = riskPerLevel / (distToSLPips * pipValueStandard);
-            lotForLevel = Math.max(0.01, Math.round(lotForLevel * 100) / 100);
-            row.dataset.calculatedLot = lotForLevel;
-          });
-          baseLotStandard = 0.01;
+          if (method === 'equal_risk') {
+            // Равномерный риск (как было раньше)
+            const riskPerLevel = targetRisk / rows.length;
+            let maxLotFound = 0;
+            rows.forEach((row, i) => {
+              const price = direction === "long" ? entry - (stepPips * i * pipSize) : entry + (stepPips * i * pipSize);
+              const distToSLPips = Math.abs(price - globalSLPrice) / pipSize;
+              let lotForLevel = riskPerLevel / (distToSLPips * pipValueStandard);
+              lotForLevel = Math.max(0.01, Math.round(lotForLevel * 100) / 100);
+              row.dataset.calculatedLot = lotForLevel;
+            });
+            baseLotStandard = 0.01;
+
+          } else if (method === 'equal_lots') {
+            // Равномерные лоты: Считаем лот так, чтобы даже самый рискованный ордер (последний) не превышал бюджет
+            // Самая большая дистанция до стопа у последнего ордера
+            const maxDistPips = slStepPips + ((rows.length - 1) * stepPips);
+            // Бюджет / (МаксДист * СтоимостьПункта * Кол-воОрдеров) ? Нет, бюджет - это сумма всех рисков.
+            // Но если мы хотим, чтобы при срабатывании ВСЕЙ сетки мы потеряли ровно Budget:
+            // Sum(Lot * Dist_i * Value) = Budget
+            // Lot * Sum(Dist_i * Value) = Budget
+            // Lot = Budget / Sum(Dist_i * Value)
+            let sumDistances = 0;
+            rows.forEach((_, i) => {
+              const price = direction === "long" ? entry - (stepPips * i * pipSize) : entry + (stepPips * i * pipSize);
+              const dist = Math.abs(price - globalSLPrice) / pipSize;
+              sumDistances += dist;
+            });
+            baseLotStandard = targetRisk / (sumDistances * pipValueStandard);
+            baseLotStandard = Math.max(0.01, Math.round(baseLotStandard * 100) / 100);
+
+          } else if (method === 'progression') {
+            // Прогрессия с множителем: Lot_i = BaseLot * (Multiplier ^ i)
+            // Sum(BaseLot * Mult^i * Dist_i * Value) = Budget
+            // BaseLot = Budget / Sum(Mult^i * Dist_i * Value)
+            const multiplier = parseFloat($("progMultiplier").value) || 1.5;
+            let weightedSum = 0;
+            rows.forEach((_, i) => {
+              const price = direction === "long" ? entry - (stepPips * i * pipSize) : entry + (stepPips * i * pipSize);
+              const dist = Math.abs(price - globalSLPrice) / pipSize;
+              const multFactor = Math.pow(multiplier, i);
+              weightedSum += multFactor * dist;
+            });
+            baseLotStandard = targetRisk / (weightedSum * pipValueStandard);
+            baseLotStandard = Math.max(0.01, Math.round(baseLotStandard * 100) / 100);
+          }
         }
         
         const orders = [];
@@ -895,7 +958,19 @@
           const tpPipsInput = parseFloat(row.querySelector(".inp-tp").value);
           
           const price = direction === "long" ? entry - (stepPips * i * pipSize) : entry + (stepPips * i * pipSize);
-          const lotStandard = mode === 'budget' ? parseFloat(row.dataset.calculatedLot) : (baseLotStandard * mult);
+          
+          // Лот: либо рассчитанный (budget), либо базовый × множитель (coef)
+          let lotStandard;
+          if (mode === 'budget') {
+             if ($("gridBudgetMethod").value === 'progression') {
+                const multiplier = parseFloat($("progMultiplier").value) || 1.5;
+                lotStandard = baseLotStandard * Math.pow(multiplier, i);
+             } else {
+                lotStandard = baseLotStandard;
+             }
+          } else {
+             lotStandard = baseLotStandard * mult;
+          }
           
           // Риск всегда считаем от глобального стопа
           const distToSL = Math.abs(price - globalSLPrice) / pipSize;
@@ -957,7 +1032,7 @@
         const btn = document.querySelector(".copy-btn"); 
         btn.textContent = "✅ Скопировано!"; 
         btn.classList.add("copied"); 
-        setTimeout(() => { btn.textContent = " Копировать уровни для терминала"; btn.classList.remove("copied"); }, 2000); 
+        setTimeout(() => { btn.textContent = "📋 Копировать уровни для терминала"; btn.classList.remove("copied"); }, 2000); 
       }).catch(() => alert("Не удалось скопировать.")); 
     }
     
